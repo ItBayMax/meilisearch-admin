@@ -1,0 +1,352 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* System font stacks - no external dependencies */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Custom styles */
+:root {
+  --color-primary: #0ea5e9;
+  --color-primary-dark: #0284c7;
+  --color-bg-dark: #0f172a;
+  --color-bg-darker: #020617;
+  --color-bg-card: #0f172a;
+  --color-border: #334155;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-scrollbar-track: #1e293b;
+  --color-scrollbar-thumb: #475569;
+}
+
+/* Theme: Tech (Default) */
+.theme-tech {
+  --color-primary: #0ea5e9;
+  --color-primary-dark: #0284c7;
+  --color-bg-dark: #0f172a;
+  --color-bg-darker: #020617;
+  --color-bg-card: #0f172a;
+  --color-border: #334155;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+}
+
+/* Theme: Pink */
+.theme-pink {
+  --color-primary: #ec4899;
+  --color-primary-dark: #db2777;
+  --color-bg-dark: #fef2f2;
+  --color-bg-darker: #fef5f9;
+  --color-bg-card: #ffffff;
+  --color-border: #fecdd3;
+  --color-text: #881337;
+  --color-text-secondary: #be123c;
+}
+
+/* Theme: Dark */
+.theme-dark {
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-bg-dark: #111111;
+  --color-bg-darker: #000000;
+  --color-bg-card: #111111;
+  --color-border: #333333;
+  --color-text: #ffffff;
+  --color-text-secondary: #888888;
+}
+
+/* Theme: Light */
+.theme-light {
+  --color-primary: #0969da;
+  --color-primary-dark: #0550ae;
+  --color-bg-dark: #f6f8fa;
+  --color-bg-darker: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-border: #d0d7de;
+  --color-text: #1f2328;
+  --color-text-secondary: #656d76;
+  --color-scrollbar-track: #f6f8fa;
+  --color-scrollbar-thumb: #d0d7de;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-darker);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+/* Theme-aware background and text */
+.theme-light .bg-dark-950 { background-color: #ffffff !important; }
+.theme-light .bg-dark-900 { background-color: var(--color-bg-card) !important; }
+.theme-light .bg-dark-800 { background-color: #f6f8fa !important; }
+.theme-light .bg-dark-700 { background-color: #eaeef2 !important; }
+.theme-light .border-dark-700 { border-color: var(--color-border) !important; }
+.theme-light .border-dark-600 { border-color: #d8dee4 !important; }
+.theme-light .text-white { color: var(--color-text) !important; }
+.theme-light .text-gray-400 { color: var(--color-text-secondary) !important; }
+.theme-light .text-gray-300 { color: #59636e !important; }
+.theme-light .text-gray-500 { color: #656d76 !important; }
+.theme-light .hover\:bg-dark-800:hover { background-color: #f6f8fa !important; }
+.theme-light .hover\:bg-dark-700:hover { background-color: #eaeef2 !important; }
+.theme-light .hover\:text-white:hover { color: var(--color-text) !important; }
+
+.theme-pink .bg-dark-950 { background-color: #fef5f9 !important; }
+.theme-pink .bg-dark-900 { background-color: var(--color-bg-card) !important; }
+.theme-pink .bg-dark-800 { background-color: #fce7f3 !important; }
+.theme-pink .bg-dark-700 { background-color: #fbcfe8 !important; }
+.theme-pink .border-dark-700 { border-color: var(--color-border) !important; }
+.theme-pink .border-dark-600 { border-color: #f9a8d4 !important; }
+.theme-pink .btn-primary { background-color: var(--color-primary) !important; color: #ffffff !important; }
+.theme-pink .btn-primary:hover { background-color: var(--color-primary-dark) !important; }
+.theme-pink .text-white { color: var(--color-text) !important; }
+.theme-pink .text-gray-400 { color: var(--color-text-secondary) !important; }
+.theme-pink .text-gray-300 { color: #9d174d !important; }
+.theme-pink .text-gray-500 { color: #be185d !important; }
+.theme-pink .hover\:bg-dark-800:hover { background-color: #fce7f3 !important; }
+.theme-pink .hover\:bg-dark-700:hover { background-color: #fbcfe8 !important; }
+.theme-pink .hover\:text-white:hover { color: var(--color-text) !important; }
+
+.theme-dark .bg-dark-900 { background-color: var(--color-bg-card) !important; }
+.theme-dark .bg-dark-800 { background-color: #1a1a1a !important; }
+.theme-dark .border-dark-700 { border-color: var(--color-border) !important; }
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Light theme scrollbar */
+.theme-light ::-webkit-scrollbar-track {
+  background: #f6f8fa;
+}
+
+.theme-light ::-webkit-scrollbar-thumb {
+  background: #d0d7de;
+  border-radius: 4px;
+}
+
+.theme-light ::-webkit-scrollbar-thumb:hover {
+  background: #afb8c1;
+}
+
+/* Pink theme scrollbar */
+.theme-pink ::-webkit-scrollbar-track {
+  background: #fef5f9;
+}
+
+.theme-pink ::-webkit-scrollbar-thumb {
+  background: #fecdd3;
+  border-radius: 4px;
+}
+
+.theme-pink ::-webkit-scrollbar-thumb:hover {
+  background: #fda4af;
+}
+
+/* Card styles */
+@layer components {
+  .card {
+    @apply bg-dark-900 rounded-xl border border-dark-700 shadow-lg;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:border-primary-500/50 hover:shadow-primary-500/10;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply bg-dark-700 hover:bg-dark-600 text-gray-200 focus:ring-dark-500;
+  }
+  
+  .theme-light .btn-secondary {
+    background-color: #f6f8fa !important;
+    color: #1f2328 !important;
+    border: 1px solid #d0d7de !important;
+  }
+  
+  .theme-light .btn-secondary:hover {
+    background-color: #eaeef2 !important;
+    border-color: #afb8c1 !important;
+  }
+  
+  .theme-pink .btn-secondary {
+    background-color: #fce7f3 !important;
+    color: #881337 !important;
+    border: 1px solid #fecdd3 !important;
+  }
+  
+  .theme-pink .btn-secondary:hover {
+    background-color: #fbcfe8 !important;
+    border-color: #fda4af !important;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white focus:ring-red-500;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent hover:bg-dark-800 text-gray-300 hover:text-white;
+  }
+  
+  .theme-light .btn-ghost {
+    color: #656d76 !important;
+  }
+  
+  .theme-light .btn-ghost:hover {
+    background-color: #f6f8fa !important;
+    color: #1f2328 !important;
+  }
+  
+  .theme-pink .btn-ghost {
+    color: #be123c !important;
+  }
+  
+  .theme-pink .btn-ghost:hover {
+    background-color: #fce7f3 !important;
+    color: #881337 !important;
+  }
+  
+  .input {
+    @apply w-full px-4 py-2.5 bg-dark-800 border border-dark-600 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors;
+  }
+  
+  .theme-light .input {
+    background-color: #ffffff !important;
+    border-color: #d0d7de !important;
+    color: #1f2328 !important;
+  }
+  
+  .theme-light .input::placeholder {
+    color: #656d76 !important;
+  }
+  
+  .theme-light .input:focus {
+    border-color: #0969da !important;
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1) !important;
+  }
+  
+  .theme-pink .input {
+    background-color: #ffffff !important;
+    border-color: #fecdd3 !important;
+    color: #881337 !important;
+  }
+  
+  .theme-pink .input::placeholder {
+    color: #be123c !important;
+  }
+  
+  .theme-pink .input:focus {
+    border-color: #ec4899 !important;
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1) !important;
+  }
+  
+  .label {
+    @apply block text-sm font-medium text-gray-300 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-green-500/20 text-green-400;
+  }
+  
+  .theme-light .badge-success {
+    background-color: #dafbe1 !important;
+    color: #1a7f37 !important;
+  }
+  
+  .theme-pink .badge-success {
+    background-color: #dcfce7 !important;
+    color: #15803d !important;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-500/20 text-yellow-400;
+  }
+  
+  .theme-light .badge-warning {
+    background-color: #fff8c5 !important;
+    color: #9a6700 !important;
+  }
+  
+  .theme-pink .badge-warning {
+    background-color: #fef3c7 !important;
+    color: #d97706 !important;
+  }
+  
+  .badge-danger {
+    @apply bg-red-500/20 text-red-400;
+  }
+  
+  .theme-light .badge-danger {
+    background-color: #ffebe9 !important;
+    color: #cf222e !important;
+  }
+  
+  .theme-pink .badge-danger {
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+  }
+  
+  .badge-info {
+    @apply bg-blue-500/20 text-blue-400;
+  }
+  
+  .theme-light .badge-info {
+    background-color: #ddf4ff !important;
+    color: #0969da !important;
+  }
+  
+  .theme-pink .badge-info {
+    background-color: #dbeafe !important;
+    color: #2563eb !important;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Code/JSON display */
+.code-block {
+  @apply bg-dark-950 rounded-lg p-4 text-sm overflow-x-auto;
+  font-family: var(--font-mono);
+}
+
+/* Mono font for code elements */
+code, pre, .font-mono {
+  font-family: var(--font-mono) !important;
+}

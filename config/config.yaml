@@ -1,0 +1,45 @@
+# Meilisearch Admin Configuration
+# Environment: development | production | testing
+
+app:
+  name: "Meilisearch Admin"
+  version: "1.0.0"
+  debug: true
+  secret_key: "your-secret-key-change-in-production"
+
+server:
+  host: "0.0.0.0"
+  port: 5000
+  workers: 4
+
+database:
+  # SQLite configuration (default)
+  type: "sqlite"
+  path: "./data/meilisearch_admin.db"
+  
+  # MySQL configuration (optional)
+  # type: "mysql"
+  # host: "localhost"
+  # port: 3306
+  # username: "root"
+  # password: ""
+  # database: "meilisearch_admin"
+  
+  pool_size: 10
+  pool_recycle: 3600
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  output_dir: "./logs"
+  file_name: "meilisearch_admin.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+cors:
+  enabled: true
+  origins:
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+    - "http://127.0.0.1:3000"
+    - "http://127.0.0.1:8080"

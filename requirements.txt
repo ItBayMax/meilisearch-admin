@@ -1,0 +1,14 @@
+flask>=3.0.0
+flask-cors>=4.0.0
+gunicorn>=21.0.0
+gevent>=23.0.0
+sqlalchemy>=2.0.0
+meilisearch>=0.31.0
+pyyaml>=6.0
+logbook>=1.7.0
+simplejson>=3.19.0
+marshmallow>=3.20.0
+requests>=2.31.0
+urllib3>=2.0.0
+python-dotenv>=1.0.0
+supervisor>=4.2.0

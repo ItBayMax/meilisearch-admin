@@ -80,6 +80,30 @@ export const indexApi = {
     return api.delete(`/projects/${projectId}/indexes/${encodeURIComponent(uid)}/documents`)
   },
 
+  // Upload documents from file
+  uploadDocumentsFile(projectId, uid, file, primaryKey) {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (primaryKey) {
+      formData.append('primaryKey', primaryKey)
+    }
+    return api.post(`/projects/${projectId}/indexes/${encodeURIComponent(uid)}/documents/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+
+  // Fetch documents from URL
+  fetchDocumentsFromUrl(projectId, uid, url, fieldPath, primaryKey, headers) {
+    return api.post(`/projects/${projectId}/indexes/${encodeURIComponent(uid)}/documents/fetch-url`, {
+      url,
+      fieldPath,
+      primaryKey,
+      headers
+    })
+  },
+
   // Search
   search(projectId, uid, query, params = {}) {
     return api.post(`/projects/${projectId}/indexes/${encodeURIComponent(uid)}/search`, { q: query, ...params })

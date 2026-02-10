@@ -1,6 +1,8 @@
 """
 Index API endpoints
 """
+import json
+import requests as http_requests
 from flask import Blueprint, request, jsonify
 from backend.services import ProjectService
 
@@ -154,6 +156,102 @@ def add_documents(project_id, uid):
     try:
         result = service.add_documents(uid, documents, primary_key)
         return jsonify({"success": True, "data": result}), 201
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@index_bp.route("/<string:uid>/documents/upload", methods=["POST"])
+def upload_documents_file(project_id, uid):
+    """Add documents by uploading a JSON or CSV file"""
+    service = get_meilisearch_service(project_id)
+    if not service:
+        return jsonify({"success": False, "error": "Project not found"}), 404
+
+    file = request.files.get("file")
+    if not file:
+        return jsonify({"success": False, "error": "No file provided"}), 400
+
+    primary_key = request.form.get("primaryKey")
+    filename = file.filename.lower()
+
+    try:
+        if filename.endswith(".json"):
+            content = file.read().decode("utf-8")
+            documents = json.loads(content)
+            if isinstance(documents, dict):
+                documents = [documents]
+        elif filename.endswith(".csv"):
+            import csv
+            import io
+            content = file.read().decode("utf-8")
+            reader = csv.DictReader(io.StringIO(content))
+            documents = [row for row in reader]
+        else:
+            return jsonify({"success": False, "error": "Unsupported file format. Only .json and .csv are supported."}), 400
+
+        if not documents:
+            return jsonify({"success": False, "error": "File contains no documents"}), 400
+
+        result = service.add_documents(uid, documents, primary_key if primary_key else None)
+        return jsonify({"success": True, "data": result, "count": len(documents)}), 201
+    except json.JSONDecodeError:
+        return jsonify({"success": False, "error": "Invalid JSON file format"}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@index_bp.route("/<string:uid>/documents/fetch-url", methods=["POST"])
+def fetch_documents_from_url(project_id, uid):
+    """Add documents by fetching from a remote URL and extracting a specific field"""
+    service = get_meilisearch_service(project_id)
+    if not service:
+        return jsonify({"success": False, "error": "Project not found"}), 404
+
+    data = request.get_json()
+    url = data.get("url")
+    field_path = data.get("fieldPath", "")  # e.g. "data.items" or "results"
+    primary_key = data.get("primaryKey")
+    headers = data.get("headers", {})  # optional custom headers
+
+    if not url:
+        return jsonify({"success": False, "error": "URL is required"}), 400
+
+    try:
+        resp = http_requests.get(url, headers=headers, timeout=30)
+        resp.raise_for_status()
+        body = resp.json()
+
+        # Extract documents from response using field_path
+        documents = body
+        if field_path:
+            for key in field_path.split("."):
+                key = key.strip()
+                if isinstance(documents, dict) and key in documents:
+                    documents = documents[key]
+                elif isinstance(documents, list) and key.isdigit():
+                    documents = documents[int(key)]
+                else:
+                    return jsonify({"success": False, "error": f"Field path '{field_path}' not found in response"}), 400
+
+        if isinstance(documents, dict):
+            documents = [documents]
+
+        if not isinstance(documents, list):
+            return jsonify({"success": False, "error": "Extracted data is not a list of documents"}), 400
+
+        if not documents:
+            return jsonify({"success": False, "error": "No documents found at the specified field path"}), 400
+
+        result = service.add_documents(uid, documents, primary_key if primary_key else None)
+        return jsonify({"success": True, "data": result, "count": len(documents)}), 201
+    except http_requests.exceptions.Timeout:
+        return jsonify({"success": False, "error": "Request timed out"}), 504
+    except http_requests.exceptions.ConnectionError:
+        return jsonify({"success": False, "error": "Failed to connect to the URL"}), 502
+    except http_requests.exceptions.HTTPError as e:
+        return jsonify({"success": False, "error": f"HTTP error: {e.response.status_code}"}), 502
+    except json.JSONDecodeError:
+        return jsonify({"success": False, "error": "Response is not valid JSON"}), 400
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

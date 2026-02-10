@@ -146,40 +146,143 @@
     <!-- Add Documents Modal -->
     <Modal v-model:visible="showAddDocsModal" :title="settingsStore.t('addDocuments')" size="lg">
       <div class="space-y-4">
-        <div v-if="selectedIndex?.primaryKey" class="bg-dark-800 rounded-lg p-3 flex items-center space-x-2">
+        <!-- Tabs for import method selection -->
+        <div class="flex border-b border-dark-600 mb-4">
+          <button
+            @click="docsForm.importMethod = 'json'"
+            :class="['px-4 py-2 font-medium text-sm', docsForm.importMethod === 'json' ? 'text-white border-b-2 border-primary-500' : 'text-gray-400 hover:text-white']"
+          >
+            {{ settingsStore.t('jsonTabLabel') }}
+          </button>
+          <button
+            @click="docsForm.importMethod = 'file'"
+            :class="['px-4 py-2 font-medium text-sm', docsForm.importMethod === 'file' ? 'text-white border-b-2 border-primary-500' : 'text-gray-400 hover:text-white']"
+          >
+            {{ settingsStore.t('fileTabLabel') }}
+          </button>
+          <button
+            @click="docsForm.importMethod = 'url'"
+            :class="['px-4 py-2 font-medium text-sm', docsForm.importMethod === 'url' ? 'text-white border-b-2 border-primary-500' : 'text-gray-400 hover:text-white']"
+          >
+            {{ settingsStore.t('urlTabLabel') }}
+          </button>
+        </div>
+
+        <!-- Primary Key Info (always visible) -->
+        <div v-if="selectedIndex?.primaryKey" class="bg-dark-800 rounded-lg p-3 flex items-center space-x-2 mb-4">
           <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span class="text-gray-300 text-sm">{{ settingsStore.t('primaryKey') }}: <code class="text-primary-400">{{ selectedIndex.primaryKey }}</code></span>
         </div>
 
-        <div v-else>
-          <label class="label">{{ settingsStore.t('primaryKey') }} *</label>
-          <input
-            v-model="docsForm.primaryKey"
-            type="text"
-            class="input"
-            placeholder="id"
-            required
-          />
+        <!-- JSON Input Tab -->
+        <div v-show="docsForm.importMethod === 'json'" class="space-y-4">
+          <div v-if="!selectedIndex?.primaryKey">
+            <label class="label">{{ settingsStore.t('primaryKey') }}</label>
+            <input
+              v-model="docsForm.primaryKey"
+              type="text"
+              class="input"
+              :placeholder="settingsStore.t('optional')"
+            />
+          </div>
+          <div>
+            <label class="label">{{ settingsStore.t('pasteJson') }}</label>
+            <textarea
+              v-model="docsForm.json"
+              class="input font-mono text-sm"
+              rows="12"
+              :placeholder="settingsStore.t('jsonDocuments') + ' [{\'id\': 1, \'title\': \'Document 1\'}, {\'id\': 2, \'title\': \'Document 2\'}]'"
+            ></textarea>
+          </div>
         </div>
 
-        <div>
-          <label class="label">{{ settingsStore.t('jsonDocuments') }}</label>
-          <textarea
-            v-model="docsForm.json"
-            class="input font-mono text-sm"
-            rows="12"
-            placeholder='[{"id": 1, "title": "Document 1"}, {"id": 2, "title": "Document 2"}]'
-          ></textarea>
+        <!-- File Upload Tab -->
+        <div v-show="docsForm.importMethod === 'file'" class="space-y-4">
+          <div v-if="!selectedIndex?.primaryKey">
+            <label class="label">{{ settingsStore.t('primaryKey') }}</label>
+            <input
+              v-model="docsForm.filePrimaryKey"
+              type="text"
+              class="input"
+              :placeholder="settingsStore.t('optional')"
+            />
+          </div>
+          <div>
+            <label class="label">{{ settingsStore.t('file') }}</label>
+            <div class="relative">
+              <input
+                type="file"
+                ref="fileInputRef"
+                @change="onFileChange"
+                accept=".json,.csv"
+                class="hidden"
+              />
+              <button
+                @click="$refs.fileInputRef.click()"
+                type="button"
+                class="w-full flex items-center justify-center px-4 py-2 border border-dark-600 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                {{ docsForm.selectedFile ? docsForm.selectedFile.name : settingsStore.t('chooseFile') }}
+              </button>
+              <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('uploadJsonCsv') }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL Fetch Tab -->
+        <div v-show="docsForm.importMethod === 'url'" class="space-y-4">
+          <div v-if="!selectedIndex?.primaryKey">
+            <label class="label">{{ settingsStore.t('primaryKey') }}</label>
+            <input
+              v-model="docsForm.urlPrimaryKey"
+              type="text"
+              class="input"
+              :placeholder="settingsStore.t('optional')"
+            />
+          </div>
+          <div>
+            <label class="label">{{ settingsStore.t('remoteUrl') }}</label>
+            <input
+              v-model="docsForm.url"
+              type="url"
+              class="input"
+              :placeholder="settingsStore.t('enterValidUrl')"
+              required
+            />
+          </div>
+          <div>
+            <label class="label">{{ settingsStore.t('fieldPath') }}</label>
+            <input
+              v-model="docsForm.fieldPath"
+              type="text"
+              class="input"
+              :placeholder="settingsStore.t('fieldPathPlaceholder')"
+            />
+            <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('fieldPathHint') }}</p>
+          </div>
+          <div>
+            <label class="label">{{ settingsStore.t('headers') }}</label>
+            <textarea
+              v-model="docsForm.headers"
+              class="input font-mono text-sm"
+              rows="2"
+              :placeholder="settingsStore.t('headersPlaceholder')"
+            ></textarea>
+            <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('headersHint') }}</p>
+          </div>
         </div>
       </div>
 
       <template #footer>
         <div class="flex justify-end space-x-3">
           <button @click="showAddDocsModal = false" class="btn btn-secondary">{{ settingsStore.t('cancel') }}</button>
-          <button @click="addDocuments" class="btn btn-primary" :disabled="!docsForm.json || addingDocs">
-            {{ addingDocs ? settingsStore.t('adding') : settingsStore.t('addDocuments') }}
+          <button @click="addDocuments" class="btn btn-primary" :disabled="isAddDisabled" :title="getAddButtonTitle">
+            {{ addingDocs ? settingsStore.t('adding') : settingsStore.t('import') }}
           </button>
         </div>
       </template>
@@ -205,7 +308,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, inject, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
@@ -231,7 +334,17 @@ const showDeleteModal = ref(false)
 const selectedIndex = ref(null)
 
 const createForm = reactive({ uid: '', primaryKey: '' })
-const docsForm = reactive({ primaryKey: '', json: '' })
+const docsForm = reactive({
+  importMethod: 'json',  // json, file, or url
+  primaryKey: '',
+  json: '',
+  selectedFile: null,
+  filePrimaryKey: '',
+  url: '',
+  fieldPath: '',
+  urlPrimaryKey: '',
+  headers: ''
+})
 
 const fetchIndexes = async () => {
   loading.value = true
@@ -274,27 +387,17 @@ const createIndex = async () => {
 
 const openAddDocuments = (index) => {
   selectedIndex.value = index
-  docsForm.primaryKey = ''
+  // Reset form when opening
   docsForm.json = ''
+  docsForm.selectedFile = null
+  docsForm.primaryKey = ''
+  docsForm.filePrimaryKey = ''
+  docsForm.url = ''
+  docsForm.fieldPath = ''
+  docsForm.urlPrimaryKey = ''
+  docsForm.headers = ''
   activeMenu.value = null
   showAddDocsModal.value = true
-}
-
-const addDocuments = async () => {
-  if (!docsForm.json) return
-  addingDocs.value = true
-  try {
-    const documents = JSON.parse(docsForm.json)
-    const primaryKey = selectedIndex.value?.primaryKey || docsForm.primaryKey || null
-    await indexApi.addDocuments(projectId.value, selectedIndex.value.uid, documents, primaryKey)
-    showAddDocsModal.value = false
-    fetchIndexes()
-  } catch (err) {
-    console.error('Failed to add documents:', err)
-    alert('Invalid JSON format or failed to add documents')
-  } finally {
-    addingDocs.value = false
-  }
 }
 
 const confirmDelete = (index) => {
@@ -347,4 +450,99 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', closeMenu)
 })
+
+
+const fileInputRef = ref(null)
+
+const onFileChange = (event) => {
+  docsForm.selectedFile = event.target.files[0]
+}
+
+const isAddDisabled = computed(() => {
+  if (docsForm.importMethod === 'json') {
+    return !docsForm.json || addingDocs.value
+  } else if (docsForm.importMethod === 'file') {
+    return !docsForm.selectedFile || addingDocs.value
+  } else if (docsForm.importMethod === 'url') {
+    return !docsForm.url || addingDocs.value
+  }
+  return true
+})
+
+const getAddButtonTitle = computed(() => {
+  if (docsForm.importMethod === 'json' && !docsForm.json) {
+    return settingsStore.t('jsonDocuments') + ' ' + settingsStore.t('required')
+  } else if (docsForm.importMethod === 'file' && !docsForm.selectedFile) {
+    return settingsStore.t('file') + ' ' + settingsStore.t('required')
+  } else if (docsForm.importMethod === 'url' && !docsForm.url) {
+    return settingsStore.t('remoteUrl') + ' ' + settingsStore.t('required')
+  }
+  return ''
+})
+
+const addDocuments = async () => {
+  if (isAddDisabled.value) return
+  addingDocs.value = true
+  
+  try {
+    if (docsForm.importMethod === 'json') {
+      // Original JSON method
+      const documents = JSON.parse(docsForm.json)
+      const primaryKey = selectedIndex.value?.primaryKey || docsForm.primaryKey || null
+      await indexApi.addDocuments(projectId.value, selectedIndex.value.uid, documents, primaryKey)
+    } else if (docsForm.importMethod === 'file') {
+      // File upload method
+      const primaryKey = selectedIndex.value?.primaryKey || docsForm.filePrimaryKey || null
+      await indexApi.uploadDocumentsFile(projectId.value, selectedIndex.value.uid, docsForm.selectedFile, primaryKey)
+    } else if (docsForm.importMethod === 'url') {
+      // URL fetch method
+      let headersObj = {}
+      if (docsForm.headers.trim()) {
+        try {
+          headersObj = JSON.parse(docsForm.headers)
+        } catch {
+          alert(settingsStore.t('invalidHeadersFormat'))
+          return
+        }
+      }
+      const primaryKey = selectedIndex.value?.primaryKey || docsForm.urlPrimaryKey || null
+      await indexApi.fetchDocumentsFromUrl(
+        projectId.value, 
+        selectedIndex.value.uid, 
+        docsForm.url, 
+        docsForm.fieldPath,
+        primaryKey,
+        headersObj
+      )
+    }
+    
+    showAddDocsModal.value = false
+    fetchIndexes()
+    // Reset form
+    docsForm.json = ''
+    docsForm.selectedFile = null
+    docsForm.primaryKey = ''
+    docsForm.filePrimaryKey = ''
+    docsForm.url = ''
+    docsForm.fieldPath = ''
+    docsForm.urlPrimaryKey = ''
+    docsForm.headers = ''
+  } catch (err) {
+    console.error('Failed to add documents:', err)
+    let errorMsg = err.message || 'Unknown error'
+    if (err.response?.data?.error) {
+      errorMsg = err.response.data.error
+    }
+    alert(settingsStore.t('failedToAddDocuments') + ': ' + errorMsg)
+  } finally {
+    addingDocs.value = false
+  }
+}
+
+// Call on component mount
+onMounted(() => {
+  fetchIndexes()
+  document.addEventListener('click', closeMenu)
+})
+
 </script>

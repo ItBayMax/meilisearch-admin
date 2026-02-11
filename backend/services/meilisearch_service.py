@@ -27,6 +27,21 @@ def _to_dict(obj: Any, convert_keys: bool = True) -> Any:
         if convert_keys:
             return {_snake_to_camel(k): _to_dict(v, convert_keys) for k, v in obj.__dict__.items() if not k.startswith('_')}
         return {k: _to_dict(v, convert_keys) for k, v in obj.__dict__.items() if not k.startswith('_')}
+    
+    # 特殊处理Meilisearch搜索结果对象
+    if hasattr(obj, '_SearchResult__dict'):
+        # Meilisearch SearchResult对象
+        result_dict = {}
+        for attr in dir(obj):
+            if not attr.startswith('_') and not callable(getattr(obj, attr)):
+                try:
+                    value = getattr(obj, attr)
+                    key = _snake_to_camel(attr) if convert_keys else attr
+                    result_dict[key] = _to_dict(value, convert_keys)
+                except:
+                    pass
+        return result_dict
+    
     # Fallback for other types
     return obj
 
@@ -147,9 +162,35 @@ class MeilisearchService:
     
     def search(self, uid: str, query: str, params: Dict[str, Any] = None) -> Dict[str, Any]:
         """Search documents in an index"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
         index = self.client.index(uid)
         search_params = params or {}
-        return index.search(query, search_params)
+        
+        # 记录搜索参数
+        logger.info(f"搜索参数: query='{query}', params={search_params}")
+        
+        result = index.search(query, search_params)
+        
+        # 记录原始结果类型和内容
+        logger.info(f"原始结果类型: {type(result)}")
+        if hasattr(result, '__dict__'):
+            logger.info(f"原始结果属性: {dir(result)}")
+        elif isinstance(result, dict):
+            logger.info(f"原始结果键: {list(result.keys())}")
+            if 'semanticHitCount' in result:
+                logger.info(f"✅ 找到 semanticHitCount: {result['semanticHitCount']}")
+        # 直接返回结果，因为已经是字典格式
+        # 只对嵌套的对象进行转换
+        if isinstance(result, dict):
+            converted_result = {}
+            for key, value in result.items():
+                converted_result[key] = _to_dict(value, convert_keys=False)
+            return converted_result
+        else:
+            # 如果不是字典，使用原来的转换逻辑
+            return _to_dict(result, convert_keys=False)
     
     # ==================== Settings ====================
     

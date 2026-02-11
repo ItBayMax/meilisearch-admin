@@ -212,9 +212,7 @@
               rows="3"
               placeholder="A document titled '{{doc.title}}' with content: {{doc.content}}"
             ></textarea>
-            <p class="text-gray-500 text-xs mt-1">
-              Liquid template defining data sent to embedder. Use <code class="text-primary-400">{"{{doc.field}}"}</code> to reference fields.
-            </p>
+            <p class="text-gray-500 text-xs mt-1" v-html="documentTemplateHelpText"></p>
           </div>
 
           <div v-if="form.source !== 'userProvided'">
@@ -296,6 +294,10 @@ const form = reactive({
   request: '',
   response: '',
   binaryQuantized: false,
+})
+
+const documentTemplateHelpText = computed(() => {
+  return 'Liquid template defining data sent to embedder. Use <code class="text-primary-400">{{"{{doc.field}}"}}</code> to reference fields.'
 })
 
 const isValidForm = computed(() => {

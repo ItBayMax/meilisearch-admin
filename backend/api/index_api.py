@@ -139,6 +139,7 @@ def get_document(project_id, uid, doc_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+
 @index_bp.route("/<string:uid>/documents", methods=["POST"])
 def add_documents(project_id, uid):
     """Add documents to an index"""
@@ -300,11 +301,15 @@ def delete_documents(project_id, uid):
 @index_bp.route("/<string:uid>/search", methods=["POST"])
 def search(project_id, uid):
     """Search documents in an index"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     service = get_meilisearch_service(project_id)
     if not service:
         return jsonify({"success": False, "error": "Project not found"}), 404
     
     data = request.get_json()
+    logger.info(f"接收到的请求数据: {data}")
     query = data.get("q", "")
     
     search_params = {}
@@ -324,6 +329,16 @@ def search(project_id, uid):
         search_params["attributesToHighlight"] = data["attributesToHighlight"]
     if "showRankingScore" in data:
         search_params["showRankingScore"] = data["showRankingScore"]
+    if "showRankingScoreDetails" in data:
+        search_params["showRankingScoreDetails"] = data["showRankingScoreDetails"]
+    if "vector" in data:
+        search_params["vector"] = data["vector"]
+    if "hybrid" in data:
+        search_params["hybrid"] = data["hybrid"]
+    if "semanticRatio" in data:
+        search_params["semanticRatio"] = data["semanticRatio"]
+    
+    logger.info(f"构建的搜索参数: {search_params}")
     
     try:
         result = service.search(uid, query, search_params)

@@ -80,6 +80,58 @@
         </div>
       </div>
 
+      <!-- Experimental Features -->
+      <div class="space-y-4 pt-6 border-t border-dark-700">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('experimentalFeatures') }}</h3>
+          <button 
+            @click="loadExperimentalFeatures" 
+            class="btn btn-secondary text-sm"
+            :disabled="loadingFeatures"
+          >
+            {{ loadingFeatures ? settingsStore.t('loadingFeatures') : settingsStore.t('refresh') }}
+          </button>
+        </div>
+        
+        <Loading v-if="loadingFeatures" />
+        
+        <div v-else-if="experimentalFeatures" class="space-y-4">
+          <!-- Experimental Features Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div 
+              v-for="feature in getOrderedFeatures()" 
+              :key="feature.key" 
+              class="card p-4"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-white font-medium">{{ feature.name }}</h4>
+                  <p class="text-gray-500 text-sm mt-1">{{ feature.description }}</p>
+                </div>
+                <button 
+                  @click="toggleFeature(feature.key)" 
+                  :class="[
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none',
+                    feature.value ? 'bg-primary-500' : 'bg-dark-600'
+                  ]"
+                >
+                  <span 
+                    :class="[
+                      'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                      feature.value ? 'translate-x-6' : 'translate-x-1'
+                    ]"
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="text-center py-8 text-gray-500">
+          {{ settingsStore.t('failedToLoadFeatures') }}
+        </div>
+      </div>
+
       <!-- Danger Zone -->
       <div class="space-y-4 pt-6 border-t border-dark-700">
         <h3 class="text-lg font-semibold text-red-400">{{ settingsStore.t('dangerZone') }}</h3>
@@ -136,6 +188,8 @@ const saving = ref(false)
 const testing = ref(false)
 const deleting = ref(false)
 const showDeleteModal = ref(false)
+const loadingFeatures = ref(false)
+const experimentalFeatures = ref(null)
 
 const form = reactive({
   name: '',
@@ -220,9 +274,105 @@ const formatBytes = (bytes) => {
   return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
+const loadExperimentalFeatures = async () => {
+  loadingFeatures.value = true
+  try {
+    const result = await projectApi.getExperimentalFeatures(projectId.value)
+    if (result.success && result.data) {
+      experimentalFeatures.value = result.data
+    }
+  } catch (err) {
+    console.error('Failed to load experimental features:', err)
+    experimentalFeatures.value = null
+  } finally {
+    loadingFeatures.value = false
+  }
+}
+
+const toggleFeature = async (featureName) => {
+  if (!experimentalFeatures.value) return
+  
+  const newValue = !experimentalFeatures.value[featureName]
+  const updateData = { [featureName]: newValue }
+  
+  try {
+    const result = await projectApi.updateExperimentalFeatures(projectId.value, updateData)
+    if (result.success && result.data) {
+      experimentalFeatures.value = { ...experimentalFeatures.value, ...result.data }
+    }
+  } catch (err) {
+    console.error('Failed to update feature:', err)
+    // Revert the change
+    experimentalFeatures.value[featureName] = !newValue
+  }
+}
+
+const formatFeatureName = (key) => {
+  const nameMap = {
+    'metrics': settingsStore.t('metrics'),
+    'logsRoute': settingsStore.t('logsRoute'),
+    'containsFilter': settingsStore.t('containsFilter'),
+    'editDocumentsByFunction': settingsStore.t('editDocumentsByFunction'),
+    'network': settingsStore.t('network'),
+    'chatCompletions': settingsStore.t('chatCompletions'),
+    'multimodal': settingsStore.t('multimodal'),
+    'vectorStoreSetting': settingsStore.t('vectorStore')
+  }
+  return nameMap[key] || key.replace(/([A-Z])/g, ' $1').trim()
+}
+
+const getFeatureDescription = (key) => {
+  const descMap = {
+    'metrics': settingsStore.t('metricsDesc'),
+    'logsRoute': settingsStore.t('logsRouteDesc'),
+    'containsFilter': settingsStore.t('containsFilterDesc'),
+    'editDocumentsByFunction': settingsStore.t('editDocumentsByFunctionDesc'),
+    'network': settingsStore.t('networkDesc'),
+    'chatCompletions': settingsStore.t('chatCompletionsDesc'),
+    'multimodal': settingsStore.t('multimodalDesc'),
+    'vectorStoreSetting': settingsStore.t('vectorStoreDesc')
+  }
+  return descMap[key] || settingsStore.t('experimentalFeatures')
+}
+
+// 获取有序的实验性功能列表，向量存储排在第一位
+const getOrderedFeatures = () => {
+  if (!experimentalFeatures.value) return []
+  
+  const orderedKeys = ['vectorStoreSetting', 'metrics', 'logsRoute', 'containsFilter', 'editDocumentsByFunction', 'network', 'chatCompletions', 'multimodal']
+  const result = []
+  
+  // 按照指定顺序添加存在的功能
+  for (const key of orderedKeys) {
+    if (key in experimentalFeatures.value) {
+      result.push({
+        key,
+        value: experimentalFeatures.value[key],
+        name: formatFeatureName(key),
+        description: getFeatureDescription(key)
+      })
+    }
+  }
+  
+  // 添加其他未在排序列表中的功能
+  for (const [key, value] of Object.entries(experimentalFeatures.value)) {
+    if (!orderedKeys.includes(key)) {
+      result.push({
+        key,
+        value,
+        name: formatFeatureName(key),
+        description: getFeatureDescription(key)
+      })
+    }
+  }
+  
+  return result
+}
+
 watch(project, loadProjectData, { immediate: true })
 
 onMounted(() => {
   fetchInstanceInfo()
+  loadExperimentalFeatures()
 })
 </script>

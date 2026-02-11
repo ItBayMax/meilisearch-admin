@@ -165,6 +165,68 @@
         </button>
       </div>
 
+      <!-- Vector Search Configuration -->
+      <div class="space-y-3 pt-4 border-t border-dark-700">
+        <h4 class="text-sm font-medium text-gray-300">{{ settingsStore.t('vectorSearch') }}</h4>
+        
+        <!-- Enable Vector Search Toggle -->
+        <div class="flex items-center justify-between">
+          <label class="text-sm text-gray-300">{{ settingsStore.t('enableVectorSearch') }}</label>
+          <button 
+            @click="enableVectorSearch = !enableVectorSearch" 
+            :class="[
+              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none',
+              enableVectorSearch ? 'bg-primary-500' : 'bg-dark-600'
+            ]"
+          >
+            <span 
+              :class="[
+                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                enableVectorSearch ? 'translate-x-6' : 'translate-x-1'
+              ]"
+            />
+          </button>
+        </div>
+
+        <!-- Semantic Ratio Slider -->
+        <div v-if="enableVectorSearch" class="space-y-2">
+          <div class="flex justify-between">
+            <label class="text-sm text-gray-300">{{ settingsStore.t('semanticRatio') }}</label>
+            <span class="text-sm text-primary-400">{{ semanticRatio }}</span>
+          </div>
+          <input 
+            v-model="semanticRatio" 
+            type="range" 
+            min="0" 
+            max="1" 
+            step="0.1"
+            class="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+          />
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>{{ settingsStore.t('keywordSearch') }}</span>
+            <span>{{ settingsStore.t('semanticSearch') }}</span>
+          </div>
+        </div>
+
+        <!-- Embedder Selection -->
+        <div v-if="enableVectorSearch && availableEmbedders.length > 0" class="space-y-2">
+          <label class="block text-sm text-gray-300">{{ settingsStore.t('selectEmbedder') }}</label>
+          <select v-model="selectedEmbedder" class="input w-full text-sm">
+            <option value="">自动选择</option>
+            <option v-for="embedder in availableEmbedders" :key="embedder" :value="embedder">
+              {{ embedder }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Hybrid Search Info -->
+        <div v-if="enableVectorSearch" class="text-xs text-gray-500 bg-dark-800 p-3 rounded-lg">
+          <p>• 混合搜索结合关键词匹配和语义理解</p>
+          <p>• 语义比例越高，越注重内容含义而非字面匹配</p>
+          <p>• 需要先在Embedders中配置嵌入器</p>
+        </div>
+      </div>
+
       <!-- Export Query Button -->
       <div class="pt-4 border-t border-dark-700">
         <button 
@@ -208,7 +270,12 @@
       <!-- Results -->
       <template v-else-if="results">
         <div class="flex items-center justify-between text-sm text-gray-400 mb-4">
-          <span>{{ results.estimatedTotalHits || results.hits?.length || 0 }} {{ settingsStore.t('results') }} ({{ results.processingTimeMs }}ms)</span>
+          <div class="flex items-center space-x-4">
+            <span>{{ results.estimatedTotalHits || results.hits?.length || 0 }} {{ settingsStore.t('results') }} ({{ results.processingTimeMs }}ms)</span>
+            <span v-if="results.semanticHitCount !== undefined" class="text-primary-400">
+              语义匹配: {{ results.semanticHitCount }}
+            </span>
+          </div>
         </div>
 
         <!-- Table View -->
@@ -254,8 +321,15 @@
                         </button>
                       </div>
                     </td>
-                    <td v-if="showRankingScore" class="px-3 py-2 text-xs text-primary-400 font-mono">
-                      {{ hit._rankingScore ? hit._rankingScore.toFixed(4) : '-' }}
+                    <td v-if="showRankingScore" class="px-3 py-2 text-xs font-mono">
+                      <div class="space-y-1">
+                        <div v-if="hit._rankingScore" class="text-primary-400">
+                          相关度: {{ hit._rankingScore.toFixed(4) }}
+                        </div>
+                        <div v-if="hit._semanticScore" class="text-green-400">
+                          语义分: {{ hit._semanticScore.toFixed(4) }}
+                        </div>
+                      </div>
                     </td>
                     <td
                       v-for="col in visibleColumns"
@@ -280,9 +354,14 @@
               class="card p-4"
             >
               <div class="flex items-center justify-between mb-2">
-                <span v-if="showRankingScore && hit._rankingScore" class="text-xs text-primary-400 font-mono">
-                  {{ settingsStore.t('score') }}: {{ hit._rankingScore.toFixed(4) }}
-                </span>
+                <div v-if="showRankingScore" class="text-xs font-mono space-y-1">
+                  <div v-if="hit._rankingScore" class="text-primary-400">
+                    相关度: {{ hit._rankingScore.toFixed(4) }}
+                  </div>
+                  <div v-if="hit._semanticScore" class="text-green-400">
+                    语义分: {{ hit._semanticScore.toFixed(4) }}
+                  </div>
+                </div>
                 <div class="flex items-center space-x-2">
                   <button @click="copyJson(hit, $event)" class="p-1 text-gray-400 hover:text-white" :title="settingsStore.t('copyJson')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -478,6 +557,12 @@ const filterableAttributes = ref([])
 const displayedAttributes = ref([])
 const filters = reactive({})
 
+// Vector search configuration
+const enableVectorSearch = ref(false)
+const semanticRatio = ref(0.7)
+const selectedEmbedder = ref('')
+const availableEmbedders = ref([])
+
 // Filter conditions for expression builder
 const filterConditions = ref([
   { attribute: '', operator: '', value: '' }
@@ -610,6 +695,16 @@ const buildMeilisearchQuery = () => {
   // 添加选择的列
   if (selectedColumns.value.length > 0) {
     query.attributesToRetrieve = selectedColumns.value
+  }
+  
+  // 添加向量搜索参数
+  if (enableVectorSearch.value && searchQuery.value) {
+    query.hybrid = {
+      semanticRatio: parseFloat(semanticRatio.value)
+    }
+    if (selectedEmbedder.value) {
+      query.hybrid.embedder = selectedEmbedder.value
+    }
   }
   
   return query
@@ -754,13 +849,25 @@ const loadSettings = () => {
       return item
     }).filter(Boolean)
     displayedAttributes.value = settings.value.displayedAttributes || ['*']
+    
+    // Load embedders
+    if (settings.value.embedders) {
+      availableEmbedders.value = Object.keys(settings.value.embedders)
+      if (availableEmbedders.value.length > 0 && !selectedEmbedder.value) {
+        selectedEmbedder.value = availableEmbedders.value[0]
+      }
+    }
   }
 }
 
 const performSearch = async () => {
   loading.value = true
   try {
-    const params = { limit: 20, showRankingScore: true }
+    const params = { 
+      limit: 20, 
+      showRankingScore: true,
+      showRankingScoreDetails: true
+    }
     
     if (sortBy.value) {
       params.sort = [sortBy.value]
@@ -770,6 +877,16 @@ const performSearch = async () => {
     const filterExpression = buildFilterExpression()
     if (filterExpression) {
       params.filter = filterExpression
+    }
+
+    // Add vector search parameters
+    if (enableVectorSearch.value && searchQuery.value) {
+      params.hybrid = {
+        semanticRatio: parseFloat(semanticRatio.value)
+      }
+      if (selectedEmbedder.value) {
+        params.hybrid.embedder = selectedEmbedder.value
+      }
     }
 
     const result = await indexApi.search(projectId.value, indexId.value, searchQuery.value, params)

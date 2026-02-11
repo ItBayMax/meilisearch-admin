@@ -35,6 +35,16 @@ export const projectApi = {
   getStats(id) {
     return api.get(`/projects/${id}/stats`)
   },
+
+  // Get experimental features
+  getExperimentalFeatures(id) {
+    return api.get(`/projects/${id}/experimental-features`)
+  },
+
+  // Update experimental features
+  updateExperimentalFeatures(id, features) {
+    return api.patch(`/projects/${id}/experimental-features`, features)
+  },
 }
 
 export const indexApi = {

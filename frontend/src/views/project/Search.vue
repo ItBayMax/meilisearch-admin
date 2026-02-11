@@ -180,6 +180,87 @@
         </button>
       </div>
 
+      <!-- Vector Search Configuration -->
+      <div v-if="selectedIndex && hasEmbeddersConfig" class="space-y-3 pt-4 border-t border-dark-700">
+        <h4 class="text-sm font-medium text-gray-300">{{ settingsStore.t('vectorSearch') }}</h4>
+        
+        <div class="flex items-center justify-between">
+          <label class="text-sm text-gray-300">{{ settingsStore.t('enableVectorSearch') }}</label>
+          <button 
+            @click="enableVectorSearch = !enableVectorSearch" 
+            :class="[
+              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none',
+              enableVectorSearch ? 'bg-primary-500' : 'bg-dark-600'
+            ]"
+          >
+            <span 
+              :class="[
+                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                enableVectorSearch ? 'translate-x-6' : 'translate-x-1'
+              ]"
+            />
+          </button>
+        </div>
+
+        <div v-if="enableVectorSearch" class="space-y-2">
+          <div class="flex justify-between">
+            <label class="text-sm text-gray-300">{{ settingsStore.t('semanticRatio') }}</label>
+            <span class="text-sm text-primary-400">{{ semanticRatio }}</span>
+          </div>
+          <input 
+            v-model="semanticRatio" 
+            type="range" 
+            min="0" 
+            max="1" 
+            step="0.1"
+            class="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+          />
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>{{ settingsStore.t('keywordSearch') }}</span>
+            <span>{{ settingsStore.t('semanticSearch') }}</span>
+          </div>
+        </div>
+
+        <!-- Embedder Selection -->
+        <div v-if="enableVectorSearch && availableEmbedders.length > 0" class="space-y-2">
+          <label class="block text-sm text-gray-300">{{ settingsStore.t('selectEmbedder') }}</label>
+          <select v-model="selectedEmbedder" class="input w-full text-sm">
+            <option value="">自动选择</option>
+            <option v-for="embedder in availableEmbedders" :key="embedder" :value="embedder">
+              {{ embedder }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Hybrid Search Info -->
+        <div v-if="enableVectorSearch" class="text-xs text-gray-500 bg-dark-800 p-3 rounded-lg">
+          <p>• {{ settingsStore.t('hybridSearchInfo1') }}</p>
+          <p>• {{ settingsStore.t('hybridSearchInfo2') }}</p>
+          <p>• {{ settingsStore.t('hybridSearchInfo3') }}</p>
+        </div>
+      </div>
+
+      <!-- No Vector Engine Warning -->
+      <div v-else-if="selectedIndex && !hasEmbeddersConfig" class="pt-4 border-t border-dark-700">
+        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+          <div class="flex items-start gap-2">
+            <svg class="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div class="flex-1">
+              <h4 class="text-sm font-medium text-yellow-500">{{ settingsStore.t('noVectorEngineConfigured') }}</h4>
+              <p class="text-xs text-yellow-400 mt-1">{{ settingsStore.t('configureVectorEngineFirst') }}</p>
+              <router-link 
+                :to="`/projects/${projectId}/indexes/${selectedIndex}/embedders`"
+                class="text-xs text-yellow-300 hover:text-yellow-200 underline mt-2 inline-block"
+              >
+                {{ settingsStore.t('goToEmbeddersSettings') }} →
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Export Query Button -->
       <div class="pt-4 border-t border-dark-700">
         <button 
@@ -488,11 +569,16 @@ const showRankingScore = ref(false)
 const showColumnSelector = ref(false)
 const currentSettings = ref(null)
 const showExportModal = ref(false)
+const enableVectorSearch = ref(false)
+const semanticRatio = ref(0.5)
+const selectedEmbedder = ref('')
+const availableEmbedders = ref([])
 
 const sortableAttributes = ref([])
 const filterableAttributes = ref([])
 const displayedAttributes = ref([])
 const filters = reactive({})
+const embeddersConfig = ref(null)
 
 // Filter conditions for expression builder
 const filterConditions = ref([
@@ -518,6 +604,10 @@ const visibleColumns = computed(() => {
     return selectedColumns.value
   }
   return allColumns.value.slice(0, 6)
+})
+
+const hasEmbeddersConfig = computed(() => {
+  return embeddersConfig.value && Object.keys(embeddersConfig.value).length > 0
 })
 
 // Filter operators based on attribute mode
@@ -768,6 +858,10 @@ const onIndexChange = async () => {
     results.value = null
     allColumns.value = []
     selectedColumns.value = []
+    embeddersConfig.value = null
+    availableEmbedders.value = []
+    selectedEmbedder.value = ''
+    enableVectorSearch.value = false
     // Reset filter conditions and selections
     filterConditions.value = [{ attribute: '', operator: '', value: '' }]
     Object.keys(filters).forEach(key => delete filters[key])
@@ -779,8 +873,13 @@ const onIndexChange = async () => {
   selectedColumns.value = []
   filterConditions.value = [{ attribute: '', operator: '', value: '' }]
   Object.keys(filters).forEach(key => delete filters[key])
+  embeddersConfig.value = null
+  availableEmbedders.value = []
+  selectedEmbedder.value = ''
+  enableVectorSearch.value = false
 
   try {
+    // Fetch general settings
     const settings = await indexApi.getSettings(projectId.value, selectedIndex.value)
     if (settings.success && settings.data) {
       currentSettings.value = settings.data
@@ -793,6 +892,21 @@ const onIndexChange = async () => {
       }).filter(Boolean)
       displayedAttributes.value = settings.data.displayedAttributes || ['*']
     }
+    
+    // Check embedders configuration from settings
+    if (settings.data && settings.data.embedders) {
+      embeddersConfig.value = settings.data.embedders
+      availableEmbedders.value = Object.keys(settings.data.embedders)
+      if (availableEmbedders.value.length > 0 && !selectedEmbedder.value) {
+        selectedEmbedder.value = availableEmbedders.value[0]
+      }
+    } else {
+      embeddersConfig.value = null
+      availableEmbedders.value = []
+      selectedEmbedder.value = ''
+      console.debug('Embedders not configured for this index')
+    }
+    
     performSearch()
   } catch (err) {
     console.error('Failed to fetch settings:', err)
@@ -803,7 +917,11 @@ const performSearch = async () => {
   if (!selectedIndex.value) return
   loading.value = true
   try {
-    const params = { limit: 20, showRankingScore: true }
+    const params = { 
+      limit: 20, 
+      showRankingScore: true,
+      showRankingScoreDetails: true
+    }
     
     if (sortBy.value) {
       params.sort = [sortBy.value]
@@ -813,6 +931,16 @@ const performSearch = async () => {
     const filterExpression = buildFilterExpression()
     if (filterExpression) {
       params.filter = filterExpression
+    }
+
+    // Add vector search parameters
+    if (enableVectorSearch.value && searchQuery.value && hasEmbeddersConfig.value) {
+      params.hybrid = {
+        semanticRatio: parseFloat(semanticRatio.value)
+      }
+      if (selectedEmbedder.value) {
+        params.hybrid.embedder = selectedEmbedder.value
+      }
     }
 
     const result = await indexApi.search(projectId.value, selectedIndex.value, searchQuery.value, params)

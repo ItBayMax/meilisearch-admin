@@ -111,3 +111,52 @@ class ProjectService:
             }
         except Exception as e:
             return {"error": str(e), "healthy": False}
+    
+    def get_experimental_features(self, project_id: int) -> Optional[Dict[str, Any]]:
+        """Get experimental features status for a project's Meilisearch instance"""
+        service = self.get_meilisearch_client(project_id)
+        if not service:
+            return None
+        
+        try:
+            # 直接调用Meilisearch的experimental-features API
+            import requests
+            headers = {}
+            if service.api_key:
+                headers["Authorization"] = f"Bearer {service.api_key}"
+            
+            response = requests.get(
+                f"{service.url}/experimental-features",
+                headers=headers,
+                timeout=10
+            )
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def update_experimental_features(self, project_id: int, features: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Update experimental features for a project's Meilisearch instance"""
+        service = self.get_meilisearch_client(project_id)
+        if not service:
+            return None
+        
+        try:
+            # 直接调用Meilisearch的experimental-features API
+            import requests
+            headers = {
+                "Content-Type": "application/json"
+            }
+            if service.api_key:
+                headers["Authorization"] = f"Bearer {service.api_key}"
+            
+            response = requests.patch(
+                f"{service.url}/experimental-features",
+                json=features,
+                headers=headers,
+                timeout=10
+            )
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            return {"error": str(e)}

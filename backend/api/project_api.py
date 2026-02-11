@@ -96,3 +96,25 @@ def get_project_stats(project_id):
     if stats is None:
         return jsonify({"success": False, "error": "Project not found"}), 404
     return jsonify({"success": True, "data": stats})
+
+
+@project_bp.route("/<int:project_id>/experimental-features", methods=["GET"])
+def get_experimental_features(project_id):
+    """Get experimental features status for a project's Meilisearch instance"""
+    features = project_service.get_experimental_features(project_id)
+    if features is None:
+        return jsonify({"success": False, "error": "Project not found or connection failed"}), 404
+    return jsonify({"success": True, "data": features})
+
+
+@project_bp.route("/<int:project_id>/experimental-features", methods=["PATCH"])
+def update_experimental_features(project_id):
+    """Update experimental features for a project's Meilisearch instance"""
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "error": "Request body is required"}), 400
+    
+    result = project_service.update_experimental_features(project_id, data)
+    if result is None:
+        return jsonify({"success": False, "error": "Project not found or connection failed"}), 404
+    return jsonify({"success": True, "data": result})

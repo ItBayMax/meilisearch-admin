@@ -4,38 +4,134 @@
     <div class="card p-6">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-lg font-semibold text-white">Searchable Attributes</h3>
-          <p class="text-gray-500 text-sm">Attributes that can be searched. Order determines relevancy impact.</p>
+          <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('searchableAttributes') }}</h3>
+          <p class="text-gray-500 text-sm">{{ settingsStore.t('searchableAttributesDesc') }}</p>
         </div>
         <button @click="saveSearchable" class="btn btn-primary text-sm" :disabled="savingSearchable">
-          {{ savingSearchable ? 'Saving...' : 'Save' }}
+          {{ savingSearchable ? settingsStore.t('saving') : settingsStore.t('save') }}
         </button>
       </div>
-      <textarea
-        v-model="searchableText"
-        class="input font-mono text-sm"
-        rows="4"
-        placeholder="Enter attributes, one per line or ['*'] for all"
-      ></textarea>
+      
+      <!-- Add new searchable attribute -->
+      <div class="mb-4 p-3 bg-dark-800 rounded-lg">
+        <h4 class="text-sm font-medium text-gray-300 mb-2">{{ settingsStore.t('addSearchableAttribute') }}</h4>
+        <div class="flex gap-2">
+          <select 
+            v-model="newSearchableName" 
+            class="input text-sm flex-1"
+            :disabled="availableSearchableAttributes.length === 0"
+          >
+            <option value="">{{ settingsStore.t('selectAttribute') }}</option>
+            <option 
+              v-for="attr in availableSearchableAttributes" 
+              :key="attr" 
+              :value="attr"
+            >
+              {{ attr }}
+            </option>
+          </select>
+          <button 
+            @click="addSearchableAttribute" 
+            class="btn btn-primary text-sm"
+            :disabled="!newSearchableName"
+          >
+            {{ settingsStore.t('add') }}
+          </button>
+        </div>
+        <div v-if="availableSearchableAttributes.length === 0" class="text-xs text-yellow-500 mt-2">
+          {{ settingsStore.t('noAvailableAttributes') }}
+        </div>
+      </div>
+      
+      <!-- Searchable attributes list -->
+      <div class="space-y-3">
+        <div 
+          v-for="(attr, index) in searchableAttributes" 
+          :key="index" 
+          class="p-3 bg-dark-800 rounded-lg border border-dark-700 flex items-center justify-between"
+        >
+          <span class="font-medium text-white">{{ attr }}</span>
+          <button 
+            @click="removeSearchableAttribute(index)" 
+            class="text-red-400 hover:text-red-300"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        
+        <div v-if="searchableAttributes.length === 0" class="text-center py-8 text-gray-500">
+          {{ settingsStore.t('noSearchableAttributes') }}
+        </div>
+      </div>
     </div>
 
     <!-- Displayed Attributes -->
     <div class="card p-6">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-lg font-semibold text-white">Displayed Attributes</h3>
-          <p class="text-gray-500 text-sm">Attributes returned in search results.</p>
+          <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('displayedAttributes') }}</h3>
+          <p class="text-gray-500 text-sm">{{ settingsStore.t('displayedAttributesDesc') }}</p>
         </div>
         <button @click="saveDisplayed" class="btn btn-primary text-sm" :disabled="savingDisplayed">
-          {{ savingDisplayed ? 'Saving...' : 'Save' }}
+          {{ savingDisplayed ? settingsStore.t('saving') : settingsStore.t('save') }}
         </button>
       </div>
-      <textarea
-        v-model="displayedText"
-        class="input font-mono text-sm"
-        rows="4"
-        placeholder="Enter attributes, one per line or ['*'] for all"
-      ></textarea>
+      
+      <!-- Add new displayed attribute -->
+      <div class="mb-4 p-3 bg-dark-800 rounded-lg">
+        <h4 class="text-sm font-medium text-gray-300 mb-2">{{ settingsStore.t('addDisplayedAttribute') }}</h4>
+        <div class="flex gap-2">
+          <select 
+            v-model="newDisplayedName" 
+            class="input text-sm flex-1"
+            :disabled="availableDisplayedAttributes.length === 0"
+          >
+            <option value="">{{ settingsStore.t('selectAttribute') }}</option>
+            <option 
+              v-for="attr in availableDisplayedAttributes" 
+              :key="attr" 
+              :value="attr"
+            >
+              {{ attr }}
+            </option>
+          </select>
+          <button 
+            @click="addDisplayedAttribute" 
+            class="btn btn-primary text-sm"
+            :disabled="!newDisplayedName"
+          >
+            {{ settingsStore.t('add') }}
+          </button>
+        </div>
+        <div v-if="availableDisplayedAttributes.length === 0" class="text-xs text-yellow-500 mt-2">
+          {{ settingsStore.t('noAvailableAttributes') }}
+        </div>
+      </div>
+      
+      <!-- Displayed attributes list -->
+      <div class="space-y-3">
+        <div 
+          v-for="(attr, index) in displayedAttributes" 
+          :key="index" 
+          class="p-3 bg-dark-800 rounded-lg border border-dark-700 flex items-center justify-between"
+        >
+          <span class="font-medium text-white">{{ attr }}</span>
+          <button 
+            @click="removeDisplayedAttribute(index)" 
+            class="text-red-400 hover:text-red-300"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        
+        <div v-if="displayedAttributes.length === 0" class="text-center py-8 text-gray-500">
+          {{ settingsStore.t('noDisplayedAttributes') }}
+        </div>
+      </div>
     </div>
 
     <!-- Filterable Attributes -->
@@ -57,11 +153,11 @@
           <select 
             v-model="newAttributeName" 
             class="input text-sm flex-1"
-            :disabled="availableAttributes.length === 0"
+            :disabled="availableFilterAttributes.length === 0"
           >
             <option value="">{{ settingsStore.t('selectAttribute') }}</option>
             <option 
-              v-for="attr in availableAttributes" 
+              v-for="attr in availableFilterAttributes" 
               :key="attr" 
               :value="attr"
             >
@@ -80,7 +176,7 @@
             {{ settingsStore.t('add') }}
           </button>
         </div>
-        <div v-if="availableAttributes.length === 0" class="text-xs text-yellow-500 mt-2">
+        <div v-if="availableFilterAttributes.length === 0" class="text-xs text-yellow-500 mt-2">
           {{ settingsStore.t('noAvailableAttributes') }}
         </div>
       </div>
@@ -127,19 +223,67 @@
     <div class="card p-6">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-lg font-semibold text-white">Sortable Attributes</h3>
-          <p class="text-gray-500 text-sm">Attributes that can be used for sorting search results.</p>
+          <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('sortableAttributes') }}</h3>
+          <p class="text-gray-500 text-sm">{{ settingsStore.t('sortableAttributesDesc') }}</p>
         </div>
         <button @click="saveSortable" class="btn btn-primary text-sm" :disabled="savingSortable">
-          {{ savingSortable ? 'Saving...' : 'Save' }}
+          {{ savingSortable ? settingsStore.t('saving') : settingsStore.t('save') }}
         </button>
       </div>
-      <textarea
-        v-model="sortableText"
-        class="input font-mono text-sm"
-        rows="4"
-        placeholder="Enter attributes, one per line"
-      ></textarea>
+      
+      <!-- Add new sortable attribute -->
+      <div class="mb-4 p-3 bg-dark-800 rounded-lg">
+        <h4 class="text-sm font-medium text-gray-300 mb-2">{{ settingsStore.t('addSortableAttribute') }}</h4>
+        <div class="flex gap-2">
+          <select 
+            v-model="newSortName" 
+            class="input text-sm flex-1"
+            :disabled="availableSortAttributes.length === 0"
+          >
+            <option value="">{{ settingsStore.t('selectAttribute') }}</option>
+            <option 
+              v-for="attr in availableSortAttributes" 
+              :key="attr" 
+              :value="attr"
+            >
+              {{ attr }}
+            </option>
+          </select>
+          <button 
+            @click="addSortAttribute" 
+            class="btn btn-primary text-sm"
+            :disabled="!newSortName"
+          >
+            {{ settingsStore.t('add') }}
+          </button>
+        </div>
+        <div v-if="availableSortAttributes.length === 0" class="text-xs text-yellow-500 mt-2">
+          {{ settingsStore.t('noAvailableAttributes') }}
+        </div>
+      </div>
+      
+      <!-- Sortable attributes list -->
+      <div class="space-y-3">
+        <div 
+          v-for="(attr, index) in sortAttributes" 
+          :key="index" 
+          class="p-3 bg-dark-800 rounded-lg border border-dark-700 flex items-center justify-between"
+        >
+          <span class="font-medium text-white">{{ attr }}</span>
+          <button 
+            @click="removeSortAttribute(index)" 
+            class="text-red-400 hover:text-red-300"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        
+        <div v-if="sortAttributes.length === 0" class="text-center py-8 text-gray-500">
+          {{ settingsStore.t('noSortAttributes') }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -154,9 +298,17 @@ const projectId = inject('projectId')
 const indexId = inject('indexId')
 const settings = inject('settings')
 
-const searchableText = ref('')
-const displayedText = ref('')
-const sortableText = ref('')
+// Searchable attributes
+const searchableAttributes = ref([])
+const newSearchableName = ref('')
+
+// Displayed attributes
+const displayedAttributes = ref([])
+const newDisplayedName = ref('')
+
+// Sortable attributes
+const sortAttributes = ref([])
+const newSortName = ref('')
 
 const savingSearchable = ref(false)
 const savingDisplayed = ref(false)
@@ -172,15 +324,34 @@ const newFilterMode = ref('equality')
 const documentFields = ref([])
 
 // Available attributes for selection (from actual document fields)
-const availableAttributes = computed(() => {
+const availableSearchableAttributes = computed(() => {
+  return documentFields.value
+    .filter(attr => !searchableAttributes.value.includes(attr))
+})
+
+const availableDisplayedAttributes = computed(() => {
+  return documentFields.value
+    .filter(attr => !displayedAttributes.value.includes(attr))
+})
+
+const availableSortAttributes = computed(() => {
+  return documentFields.value
+    .filter(attr => !sortAttributes.value.includes(attr))
+})
+
+const availableFilterAttributes = computed(() => {
   return documentFields.value
     .filter(attr => !filterableAttributes.value.some(fa => fa.name === attr))
 })
 
 const loadSettings = () => {
   if (settings.value) {
-    searchableText.value = arrayToText(settings.value.searchableAttributes)
-    displayedText.value = arrayToText(settings.value.displayedAttributes)
+    // Load searchable attributes
+    searchableAttributes.value = settings.value.searchableAttributes || []
+    
+    // Load displayed attributes
+    displayedAttributes.value = settings.value.displayedAttributes || []
+    
     // Load filterable attributes with mode information
     if (settings.value.filterableAttributes) {
       filterableAttributes.value = settings.value.filterableAttributes.map(attr => {
@@ -190,7 +361,9 @@ const loadSettings = () => {
         return attr
       })
     }
-    sortableText.value = arrayToText(settings.value.sortableAttributes)
+    
+    // Load sortable attributes
+    sortAttributes.value = settings.value.sortableAttributes || []
     
     // Extract document fields from sample documents
     extractDocumentFields()
@@ -219,22 +392,12 @@ const extractDocumentFields = async () => {
   }
 }
 
-const arrayToText = (arr) => {
-  if (!arr) return ''
-  if (arr.length === 1 && arr[0] === '*') return '*'
-  return arr.join('\n')
-}
 
-const textToArray = (text) => {
-  if (!text.trim()) return []
-  if (text.trim() === '*') return ['*']
-  return text.split('\n').map(s => s.trim()).filter(Boolean)
-}
 
 const saveSearchable = async () => {
   savingSearchable.value = true
   try {
-    await indexApi.updateSearchableAttributes(projectId.value, indexId.value, textToArray(searchableText.value))
+    await indexApi.updateSearchableAttributes(projectId.value, indexId.value, searchableAttributes.value)
   } catch (err) {
     console.error('Failed to save:', err)
   } finally {
@@ -245,12 +408,51 @@ const saveSearchable = async () => {
 const saveDisplayed = async () => {
   savingDisplayed.value = true
   try {
-    await indexApi.updateDisplayedAttributes(projectId.value, indexId.value, textToArray(displayedText.value))
+    await indexApi.updateDisplayedAttributes(projectId.value, indexId.value, displayedAttributes.value)
   } catch (err) {
     console.error('Failed to save:', err)
   } finally {
     savingDisplayed.value = false
   }
+}
+
+const addSearchableAttribute = () => {
+  if (!newSearchableName.value) return
+  
+  const existing = searchableAttributes.value.includes(newSearchableName.value)
+  if (existing) {
+    alert(settingsStore.t('attributeAlreadyExists'))
+    return
+  }
+  
+  searchableAttributes.value.push(newSearchableName.value)
+  newSearchableName.value = ''
+}
+
+const addDisplayedAttribute = () => {
+  if (!newDisplayedName.value) return
+  
+  const existing = displayedAttributes.value.includes(newDisplayedName.value)
+  if (existing) {
+    alert(settingsStore.t('attributeAlreadyExists'))
+    return
+  }
+  
+  displayedAttributes.value.push(newDisplayedName.value)
+  newDisplayedName.value = ''
+}
+
+const addSortAttribute = () => {
+  if (!newSortName.value) return
+  
+  const existing = sortAttributes.value.includes(newSortName.value)
+  if (existing) {
+    alert(settingsStore.t('attributeAlreadyExists'))
+    return
+  }
+  
+  sortAttributes.value.push(newSortName.value)
+  newSortName.value = ''
 }
 
 const addFilterAttribute = () => {
@@ -269,6 +471,18 @@ const addFilterAttribute = () => {
   
   newAttributeName.value = ''
   newFilterMode.value = 'equality'
+}
+
+const removeSearchableAttribute = (index) => {
+  searchableAttributes.value.splice(index, 1)
+}
+
+const removeDisplayedAttribute = (index) => {
+  displayedAttributes.value.splice(index, 1)
+}
+
+const removeSortAttribute = (index) => {
+  sortAttributes.value.splice(index, 1)
 }
 
 const removeFilterAttribute = (index) => {
@@ -294,7 +508,7 @@ const saveFilterable = async () => {
 const saveSortable = async () => {
   savingSortable.value = true
   try {
-    await indexApi.updateSortableAttributes(projectId.value, indexId.value, textToArray(sortableText.value))
+    await indexApi.updateSortableAttributes(projectId.value, indexId.value, sortAttributes.value)
   } catch (err) {
     console.error('Failed to save:', err)
   } finally {

@@ -55,10 +55,12 @@ yarn-debug.log*
 yarn-error.log*
 .npm
 .yarn
+package-lock.json
 
 # Build output (uncomment if you don't want to track frontend dist)
 frontend/dist/
 frontend/node_modules/
+frontend/package-lock.json
 
 # -----------------------------------------------------------------------------
 # IDE & Editors
@@ -138,6 +140,7 @@ temp/
 # -----------------------------------------------------------------------------
 .qoder/
 .trae/
+.claude/
 
 # -----------------------------------------------------------------------------
 # Docker

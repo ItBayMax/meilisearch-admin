@@ -16,7 +16,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 
 # Install dependencies
-RUN npm ci --registry=https://registry.npmmirror.com
+RUN npm set registry=https://registry.npmmirror.com
 
 # Copy frontend source and build
 COPY frontend/ ./

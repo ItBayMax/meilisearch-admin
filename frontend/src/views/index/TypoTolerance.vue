@@ -2,11 +2,11 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Typo Tolerance</h3>
-        <p class="text-gray-500 text-sm">Configure how Meilisearch handles typos in search queries.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('typoTolerance') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('typoToleranceDesc') }}</p>
       </div>
       <button @click="saveSettings" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
@@ -14,8 +14,8 @@
       <!-- Enabled -->
       <div class="flex items-center justify-between">
         <div>
-          <h4 class="text-white font-medium">Enable Typo Tolerance</h4>
-          <p class="text-gray-500 text-sm">Allow matches with typos in search queries.</p>
+          <h4 class="text-white font-medium">{{ settingsStore.t('enableLabel') }}</h4>
+          <p class="text-gray-500 text-sm">{{ settingsStore.t('enableDesc') }}</p>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" v-model="config.enabled" class="sr-only peer" />
@@ -26,7 +26,7 @@
       <!-- Min Word Size -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="label">Min Word Size for 1 Typo</label>
+          <label class="label">{{ settingsStore.t('minWordOneTypo') }}</label>
           <input
             v-model.number="config.minWordSizeForTypos.oneTypo"
             type="number"
@@ -35,7 +35,7 @@
           />
         </div>
         <div>
-          <label class="label">Min Word Size for 2 Typos</label>
+          <label class="label">{{ settingsStore.t('minWordTwoTypos') }}</label>
           <input
             v-model.number="config.minWordSizeForTypos.twoTypos"
             type="number"
@@ -47,23 +47,25 @@
 
       <!-- Disable on Words -->
       <div>
-        <label class="label">Disable on Words</label>
+        <label class="label">{{ settingsStore.t('disableOnWords') }}</label>
+        <p class="text-gray-500 text-xs mb-1">{{ settingsStore.t('disableOnWordsDesc') }}</p>
         <textarea
           v-model="disableOnWordsText"
           class="input font-mono text-sm"
           rows="3"
-          placeholder="Words to disable typo tolerance on (one per line)"
+          :placeholder="settingsStore.t('disableOnWordsPlaceholder')"
         ></textarea>
       </div>
 
       <!-- Disable on Attributes -->
       <div>
-        <label class="label">Disable on Attributes</label>
+        <label class="label">{{ settingsStore.t('disableOnAttributes') }}</label>
+        <p class="text-gray-500 text-xs mb-1">{{ settingsStore.t('disableOnAttributesDesc') }}</p>
         <textarea
           v-model="disableOnAttributesText"
           class="input font-mono text-sm"
           rows="3"
-          placeholder="Attributes to disable typo tolerance on (one per line)"
+          :placeholder="settingsStore.t('disableOnAttributesPlaceholder')"
         ></textarea>
       </div>
     </div>
@@ -72,7 +74,10 @@
 
 <script setup>
 import { ref, reactive, inject, watch, computed } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

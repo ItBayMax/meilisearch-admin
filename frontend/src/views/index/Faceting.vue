@@ -2,17 +2,17 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Faceting</h3>
-        <p class="text-gray-500 text-sm">Configure faceting behavior for search results.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('faceting') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('facetingDesc') }}</p>
       </div>
       <button @click="saveFaceting" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
     <div class="card p-6 space-y-6">
       <div>
-        <label class="label">Max Values Per Facet</label>
+        <label class="label">{{ settingsStore.t('maxValuesPerFacet') }}</label>
         <input
           v-model.number="maxValuesPerFacet"
           type="number"
@@ -21,12 +21,12 @@
           max="65535"
         />
         <p class="text-gray-500 text-xs mt-2">
-          The maximum number of facet values returned for each facet. Default is 100.
+          {{ settingsStore.t('facetingHint') }}
         </p>
       </div>
 
       <div>
-        <label class="label">Sort Facet Values By</label>
+        <label class="label">{{ settingsStore.t('sortFacetValuesBy') }}</label>
         <div class="space-y-2 mt-2">
           <label class="flex items-center space-x-2 cursor-pointer">
             <input
@@ -35,7 +35,7 @@
               value="alpha"
               class="text-primary-500"
             />
-            <span class="text-gray-300">Alphabetically (alpha)</span>
+            <span class="text-gray-300">{{ settingsStore.t('alphabetically') }}</span>
           </label>
           <label class="flex items-center space-x-2 cursor-pointer">
             <input
@@ -44,7 +44,7 @@
               value="count"
               class="text-primary-500"
             />
-            <span class="text-gray-300">By count (count)</span>
+            <span class="text-gray-300">{{ settingsStore.t('byCount') }}</span>
           </label>
         </div>
       </div>
@@ -54,7 +54,10 @@
 
 <script setup>
 import { ref, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

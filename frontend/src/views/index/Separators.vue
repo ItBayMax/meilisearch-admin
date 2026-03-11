@@ -2,35 +2,35 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Separators</h3>
-        <p class="text-gray-500 text-sm">Configure separator tokens for word segmentation.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('separators') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('separatorsDesc') }}</p>
       </div>
       <button @click="saveSeparators" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
     <div class="card p-6 space-y-6">
       <div>
-        <label class="label">Separator Tokens</label>
+        <label class="label">{{ settingsStore.t('separatorTokens') }}</label>
         <textarea
           v-model="separatorTokensText"
           class="input font-mono text-sm"
           rows="4"
-          placeholder="Characters that separate words (one per line)"
+          :placeholder="settingsStore.t('separatorTokensPlaceholder')"
         ></textarea>
-        <p class="text-gray-500 text-xs mt-1">Additional characters that should be treated as word separators.</p>
+        <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('separatorTokensHint') }}</p>
       </div>
 
       <div>
-        <label class="label">Non-Separator Tokens</label>
+        <label class="label">{{ settingsStore.t('nonSeparatorTokens') }}</label>
         <textarea
           v-model="nonSeparatorTokensText"
           class="input font-mono text-sm"
           rows="4"
-          placeholder="Characters that should NOT separate words (one per line)"
+          :placeholder="settingsStore.t('nonSeparatorTokensPlaceholder')"
         ></textarea>
-        <p class="text-gray-500 text-xs mt-1">Characters that should be kept as part of words.</p>
+        <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('nonSeparatorTokensHint') }}</p>
       </div>
     </div>
   </div>
@@ -38,7 +38,10 @@
 
 <script setup>
 import { ref, computed, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

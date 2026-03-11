@@ -316,7 +316,9 @@ const formatFeatureName = (key) => {
     'network': settingsStore.t('network'),
     'chatCompletions': settingsStore.t('chatCompletions'),
     'multimodal': settingsStore.t('multimodal'),
-    'vectorStoreSetting': settingsStore.t('vectorStore')
+    'vectorStoreSetting': settingsStore.t('vectorStore'),
+    'compositeEmbedders': settingsStore.t('compositeEmbedders'),
+    'getTaskDocumentsRoute': settingsStore.t('getTaskDocumentsRoute'),
   }
   return nameMap[key] || key.replace(/([A-Z])/g, ' $1').trim()
 }
@@ -330,7 +332,9 @@ const getFeatureDescription = (key) => {
     'network': settingsStore.t('networkDesc'),
     'chatCompletions': settingsStore.t('chatCompletionsDesc'),
     'multimodal': settingsStore.t('multimodalDesc'),
-    'vectorStoreSetting': settingsStore.t('vectorStoreDesc')
+    'vectorStoreSetting': settingsStore.t('vectorStoreDesc'),
+    'compositeEmbedders': settingsStore.t('compositeEmbeddersDesc'),
+    'getTaskDocumentsRoute': settingsStore.t('getTaskDocumentsRouteDesc'),
   }
   return descMap[key] || settingsStore.t('experimentalFeatures')
 }
@@ -339,7 +343,7 @@ const getFeatureDescription = (key) => {
 const getOrderedFeatures = () => {
   if (!experimentalFeatures.value) return []
   
-  const orderedKeys = ['vectorStoreSetting', 'metrics', 'logsRoute', 'containsFilter', 'editDocumentsByFunction', 'network', 'chatCompletions', 'multimodal']
+  const orderedKeys = ['vectorStoreSetting', 'metrics', 'logsRoute', 'containsFilter', 'editDocumentsByFunction', 'network', 'chatCompletions', 'multimodal', 'compositeEmbedders', 'getTaskDocumentsRoute']
   const result = []
   
   // 按照指定顺序添加存在的功能

@@ -2,17 +2,17 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Prefix Search</h3>
-        <p class="text-gray-500 text-sm">Configure how Meilisearch handles prefix matching during search.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('prefixSearch') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('prefixSearchDesc') }}</p>
       </div>
       <button @click="saveSettings" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
     <div class="card p-6 space-y-6">
       <div>
-        <h4 class="text-white font-medium mb-4">Prefix Search Mode</h4>
+        <h4 class="text-white font-medium mb-4">{{ settingsStore.t('prefixSearchMode') }}</h4>
         <div class="space-y-3">
           <label class="flex items-start space-x-3 p-4 bg-dark-800 rounded-lg cursor-pointer hover:bg-dark-700 transition-colors">
             <input
@@ -22,9 +22,9 @@
               class="mt-1 text-primary-500"
             />
             <div>
-              <span class="text-white font-medium">Indexing Time (Default)</span>
+              <span class="text-white font-medium">{{ settingsStore.t('indexingTime') }}</span>
               <p class="text-gray-500 text-sm mt-1">
-                Prefix search data is computed during indexing. This uses more storage but provides faster search performance.
+                {{ settingsStore.t('indexingTimeDesc') }}
               </p>
             </div>
           </label>
@@ -37,9 +37,9 @@
               class="mt-1 text-primary-500"
             />
             <div>
-              <span class="text-white font-medium">Disabled</span>
+              <span class="text-white font-medium">{{ settingsStore.t('prefixDisabled') }}</span>
               <p class="text-gray-500 text-sm mt-1">
-                Prefix search is disabled. Only exact word matches will be returned. This reduces storage but may affect search relevancy.
+                {{ settingsStore.t('prefixDisabledDesc') }}
               </p>
             </div>
           </label>
@@ -47,11 +47,9 @@
       </div>
 
       <div class="bg-dark-800 rounded-lg p-4">
-        <h4 class="text-white font-medium mb-2">What is Prefix Search?</h4>
+        <h4 class="text-white font-medium mb-2">{{ settingsStore.t('whatIsPrefixSearch') }}</h4>
         <p class="text-gray-400 text-sm">
-          Prefix search allows matching documents that begin with a specific query term. 
-          For example, searching for "hel" would match "hello", "help", "helicopter", etc.
-          This is enabled by default and computed during indexing for optimal performance.
+          {{ settingsStore.t('prefixSearchNote') }}
         </p>
       </div>
     </div>
@@ -60,7 +58,10 @@
 
 <script setup>
 import { ref, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

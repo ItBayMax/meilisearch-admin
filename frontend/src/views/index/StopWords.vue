@@ -2,11 +2,11 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Stop Words</h3>
-        <p class="text-gray-500 text-sm">Words that are ignored during search. Common words like "the", "a", "is" are typical stop words.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('stopWords') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('stopWordsDesc') }}</p>
       </div>
       <button @click="saveStopWords" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
@@ -15,10 +15,10 @@
         v-model="stopWordsText"
         class="input font-mono text-sm"
         rows="10"
-        placeholder="Enter stop words, one per line"
+        :placeholder="settingsStore.t('stopWordsPlaceholder')"
       ></textarea>
       <p class="text-gray-500 text-xs mt-2">
-        Stop words are ignored during search and do not contribute to relevancy scoring.
+        {{ settingsStore.t('stopWordsHint') }}
       </p>
     </div>
   </div>
@@ -26,7 +26,10 @@
 
 <script setup>
 import { ref, computed, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

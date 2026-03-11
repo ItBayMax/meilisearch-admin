@@ -2,11 +2,11 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Embedders</h3>
-        <p class="text-gray-500 text-sm">Configure vector embedders for AI-powered search.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('embedders') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('embeddersDesc') }}</p>
       </div>
       <button @click="openAddModal" class="btn btn-primary text-sm">
-        Add Embedder
+        {{ settingsStore.t('addEmbedder') }}
       </button>
     </div>
 
@@ -18,9 +18,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
         </div>
-        <h4 class="text-white font-medium mb-2">No Embedders Configured</h4>
+        <h4 class="text-white font-medium mb-2">{{ settingsStore.t('noEmbedders') }}</h4>
         <p class="text-gray-500 text-sm max-w-md mx-auto">
-          Embedders generate vector data from your documents for AI-powered semantic search.
+          {{ settingsStore.t('noEmbeddersDesc') }}
         </p>
       </div>
     </div>
@@ -38,18 +38,18 @@
             <span class="badge badge-info mt-1">{{ getSourceLabel(config.source) }}</span>
           </div>
           <div class="flex space-x-2">
-            <button @click="editEmbedder(name, config)" class="btn btn-ghost text-sm">Edit</button>
-            <button @click="confirmDelete(name)" class="btn btn-ghost text-red-400 text-sm">Delete</button>
+            <button @click="editEmbedder(name, config)" class="btn btn-ghost text-sm">{{ settingsStore.t('edit') }}</button>
+            <button @click="confirmDelete(name)" class="btn btn-ghost text-red-400 text-sm">{{ settingsStore.t('delete') }}</button>
           </div>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
           <div v-if="config.model">
-            <span class="text-gray-500">Model:</span>
+            <span class="text-gray-500">{{ settingsStore.t('modelLabel') }}:</span>
             <span class="text-gray-300 ml-2">{{ config.model }}</span>
           </div>
           <div v-if="config.dimensions">
-            <span class="text-gray-500">Dimensions:</span>
+            <span class="text-gray-500">{{ settingsStore.t('dimensionsLabel') }}:</span>
             <span class="text-gray-300 ml-2">{{ config.dimensions }}</span>
           </div>
           <div v-if="config.url">
@@ -57,11 +57,11 @@
             <span class="text-gray-300 ml-2 truncate">{{ config.url }}</span>
           </div>
           <div v-if="config.revision">
-            <span class="text-gray-500">Revision:</span>
+            <span class="text-gray-500">{{ settingsStore.t('revision') }}:</span>
             <span class="text-gray-300 ml-2">{{ config.revision }}</span>
           </div>
           <div v-if="config.documentTemplate" class="col-span-2">
-            <span class="text-gray-500">Template:</span>
+            <span class="text-gray-500">{{ settingsStore.t('documentTemplate') }}:</span>
             <span class="text-gray-300 ml-2 truncate block">{{ config.documentTemplate }}</span>
           </div>
         </div>
@@ -69,11 +69,11 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <Modal v-model:visible="showModal" :title="editingName ? 'Edit Embedder' : 'Add Embedder'" size="lg">
+    <Modal v-model:visible="showModal" :title="editingName ? settingsStore.t('editEmbedder') : settingsStore.t('addEmbedder')" size="lg">
       <form @submit.prevent="saveEmbedder" class="space-y-4">
         <!-- Embedder Name -->
         <div>
-          <label class="label">Embedder Name *</label>
+          <label class="label">{{ settingsStore.t('embedderName') }}</label>
           <input
             v-model="form.name"
             type="text"
@@ -82,12 +82,12 @@
             :disabled="!!editingName"
             required
           />
-          <p class="text-gray-500 text-xs mt-1">Unique identifier for this embedder</p>
+          <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('embedderNameHint') }}</p>
         </div>
 
         <!-- Source Selection -->
         <div>
-          <label class="label">Source *</label>
+          <label class="label">{{ settingsStore.t('sourceLabel') }}</label>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
             <button
               v-for="src in sources"
@@ -105,12 +105,12 @@
         <!-- OpenAI Settings -->
         <template v-if="form.source === 'openAi'">
           <div>
-            <label class="label">API Key</label>
+            <label class="label">{{ settingsStore.t('apiKeyLabel') }}</label>
             <input v-model="form.apiKey" type="password" class="input" placeholder="sk-..." />
-            <p class="text-gray-500 text-xs mt-1">Leave empty to use OPENAI_API_KEY environment variable</p>
+            <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('apiKeyOptional') }}</p>
           </div>
           <div>
-            <label class="label">Model</label>
+            <label class="label">{{ settingsStore.t('modelLabel') }}</label>
             <select v-model="form.model" class="input">
               <option value="">Default (text-embedding-3-small)</option>
               <option value="text-embedding-3-small">text-embedding-3-small</option>
@@ -119,25 +119,23 @@
             </select>
           </div>
           <div>
-            <label class="label">URL (Optional)</label>
+            <label class="label">{{ settingsStore.t('urlOptional') }}</label>
             <input v-model="form.url" type="url" class="input" placeholder="https://api.openai.com/v1/embeddings" />
-            <p class="text-gray-500 text-xs mt-1">Use for proxies or custom OpenAI-compatible endpoints</p>
           </div>
         </template>
 
         <!-- Hugging Face Settings -->
         <template v-if="form.source === 'huggingFace'">
           <div>
-            <label class="label">Model</label>
+            <label class="label">{{ settingsStore.t('modelLabel') }}</label>
             <input v-model="form.model" type="text" class="input" placeholder="BAAI/bge-base-en-v1.5" />
-            <p class="text-gray-500 text-xs mt-1">Default: BAAI/bge-base-en-v1.5</p>
           </div>
           <div>
-            <label class="label">Revision</label>
-            <input v-model="form.revision" type="text" class="input" placeholder="Model revision hash" />
+            <label class="label">{{ settingsStore.t('revision') }}</label>
+            <input v-model="form.revision" type="text" class="input" />
           </div>
           <div>
-            <label class="label">Pooling</label>
+            <label class="label">{{ settingsStore.t('poolingLabel') }}</label>
             <select v-model="form.pooling" class="input">
               <option value="">Default (useModel)</option>
               <option value="useModel">useModel</option>
@@ -150,38 +148,36 @@
         <!-- Ollama Settings -->
         <template v-if="form.source === 'ollama'">
           <div>
-            <label class="label">URL *</label>
+            <label class="label">{{ settingsStore.t('urlRequired') }}</label>
             <input v-model="form.url" type="url" class="input" placeholder="http://localhost:11434/api/embeddings" required />
           </div>
           <div>
-            <label class="label">Model *</label>
+            <label class="label">{{ settingsStore.t('modelRequired') }}</label>
             <input v-model="form.model" type="text" class="input" placeholder="nomic-embed-text" required />
           </div>
           <div>
-            <label class="label">API Key (Optional)</label>
-            <input v-model="form.apiKey" type="password" class="input" placeholder="If authentication required" />
+            <label class="label">{{ settingsStore.t('apiKeyOptional') }}</label>
+            <input v-model="form.apiKey" type="password" class="input" />
           </div>
         </template>
 
         <!-- REST API Settings -->
         <template v-if="form.source === 'rest'">
           <div>
-            <label class="label">URL *</label>
+            <label class="label">{{ settingsStore.t('urlRequired') }}</label>
             <input v-model="form.url" type="url" class="input" placeholder="https://api.example.com/embed" required />
           </div>
           <div>
-            <label class="label">API Key</label>
-            <input v-model="form.apiKey" type="password" class="input" placeholder="Bearer token or API key" />
+            <label class="label">{{ settingsStore.t('apiKeyLabel') }}</label>
+            <input v-model="form.apiKey" type="password" class="input" />
           </div>
           <div>
-            <label class="label">Request Template (JSON)</label>
+            <label class="label">{{ settingsStore.t('requestTemplate') }}</label>
             <textarea v-model="form.request" class="input font-mono text-sm" rows="4" placeholder='{"input": "{{text}}", "model": "text-embedding-3-small"}'></textarea>
-            <p class="text-gray-500 text-xs mt-1">JSON template for the request body. Use {"{{text}}"} placeholder.</p>
           </div>
           <div>
-            <label class="label">Response Path (JSON)</label>
+            <label class="label">{{ settingsStore.t('responseTemplate') }}</label>
             <textarea v-model="form.response" class="input font-mono text-sm" rows="3" placeholder='{"embeddings": "{{embedding}}"}'></textarea>
-            <p class="text-gray-500 text-xs mt-1">JSON template to extract embeddings from response.</p>
           </div>
         </template>
 
@@ -189,23 +185,23 @@
         <template v-if="form.source === 'userProvided'">
           <div class="p-4 bg-dark-800 rounded-lg">
             <p class="text-gray-400 text-sm">
-              With user-provided embeddings, you must include vector data in your documents' <code class="text-primary-400">_vectors</code> field and generate vectors for search queries manually.
+              {{ settingsStore.t('userProvidedInfo') }}
             </p>
           </div>
         </template>
 
         <!-- Common Settings -->
         <div v-if="form.source" class="border-t border-dark-700 pt-4 space-y-4">
-          <h4 class="text-white font-medium">Common Settings</h4>
+          <h4 class="text-white font-medium">{{ settingsStore.t('commonSettings') }}</h4>
           
           <div>
-            <label class="label">Dimensions</label>
-            <input v-model.number="form.dimensions" type="number" class="input" placeholder="Auto-detected if not specified" />
-            <p class="text-gray-500 text-xs mt-1">Number of dimensions in the embedding vectors</p>
+            <label class="label">{{ settingsStore.t('dimensionsLabel') }}</label>
+            <input v-model.number="form.dimensions" type="number" class="input" />
+            <p class="text-gray-500 text-xs mt-1">{{ settingsStore.t('dimensionsHint') }}</p>
           </div>
 
           <div v-if="form.source !== 'userProvided'">
-            <label class="label">Document Template</label>
+            <label class="label">{{ settingsStore.t('documentTemplate') }}</label>
             <textarea
               v-model="form.documentTemplate"
               class="input font-mono text-sm"
@@ -216,38 +212,38 @@
           </div>
 
           <div v-if="form.source !== 'userProvided'">
-            <label class="label">Document Template Max Bytes</label>
+            <label class="label">{{ settingsStore.t('documentTemplateMaxBytes') }}</label>
             <input v-model.number="form.documentTemplateMaxBytes" type="number" class="input" placeholder="400" />
           </div>
 
           <div class="flex items-center space-x-2">
             <input type="checkbox" v-model="form.binaryQuantized" id="binaryQuantized" class="rounded" />
-            <label for="binaryQuantized" class="text-gray-300 text-sm">Binary Quantized (irreversible)</label>
+            <label for="binaryQuantized" class="text-gray-300 text-sm">{{ settingsStore.t('binaryQuantized') }}</label>
           </div>
         </div>
       </form>
 
       <template #footer>
         <div class="flex justify-end space-x-3">
-          <button @click="closeModal" class="btn btn-secondary">Cancel</button>
+          <button @click="closeModal" class="btn btn-secondary">{{ settingsStore.t('cancel') }}</button>
           <button @click="saveEmbedder" class="btn btn-primary" :disabled="!isValidForm || saving">
-            {{ saving ? 'Saving...' : (editingName ? 'Update' : 'Add') }}
+            {{ saving ? settingsStore.t('saving') : (editingName ? settingsStore.t('updateBtn') : settingsStore.t('add')) }}
           </button>
         </div>
       </template>
     </Modal>
 
     <!-- Delete Confirmation -->
-    <Modal v-model:visible="showDeleteModal" title="Delete Embedder" size="sm">
+    <Modal v-model:visible="showDeleteModal" :title="settingsStore.t('deleteEmbedder')" size="sm">
       <p class="text-gray-300">
-        Are you sure you want to delete embedder "<span class="text-white font-medium">{{ deletingName }}</span>"? 
-        This may trigger reindexing of all documents.
+        {{ settingsStore.t('deleteEmbedderConfirm') }} "<span class="text-white font-medium">{{ deletingName }}</span>"?
+        {{ settingsStore.t('deleteEmbedderWarn') }}
       </p>
       <template #footer>
         <div class="flex justify-end space-x-3">
-          <button @click="showDeleteModal = false" class="btn btn-secondary">Cancel</button>
+          <button @click="showDeleteModal = false" class="btn btn-secondary">{{ settingsStore.t('cancel') }}</button>
           <button @click="deleteEmbedder" class="btn btn-danger" :disabled="deleting">
-            {{ deleting ? 'Deleting...' : 'Delete' }}
+            {{ deleting ? settingsStore.t('deleting') : settingsStore.t('delete') }}
           </button>
         </div>
       </template>
@@ -257,8 +253,11 @@
 
 <script setup>
 import { ref, reactive, computed, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
 import Modal from '@/components/common/Modal.vue'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

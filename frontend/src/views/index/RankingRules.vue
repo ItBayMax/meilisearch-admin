@@ -2,20 +2,20 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Ranking Rules</h3>
-        <p class="text-gray-500 text-sm">Rules that determine the relevancy of search results. Order matters.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('rankingRules') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('rankingRulesDesc') }}</p>
       </div>
       <div class="flex space-x-2">
-        <button @click="resetRules" class="btn btn-secondary text-sm">Reset to Default</button>
+        <button @click="resetRules" class="btn btn-secondary text-sm">{{ settingsStore.t('resetToDefault') }}</button>
         <button @click="saveRules" class="btn btn-primary text-sm" :disabled="saving">
-          {{ saving ? 'Saving...' : 'Save' }}
+          {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
         </button>
       </div>
     </div>
 
     <div class="card p-4">
       <p class="text-gray-400 text-sm mb-4">
-        Drag to reorder. The first rule has the most impact on relevancy.
+        {{ settingsStore.t('dragToReorder') }}
       </p>
 
       <div class="space-y-2">
@@ -60,19 +60,19 @@
       </div>
 
       <button @click="addRule" class="btn btn-ghost mt-4 text-sm">
-        + Add Custom Rule
+        {{ settingsStore.t('addCustomRule') }}
       </button>
     </div>
 
     <div class="card p-4">
-      <h4 class="text-white font-medium mb-2">Default Rules</h4>
+      <h4 class="text-white font-medium mb-2">{{ settingsStore.t('defaultRulesLabel') }}</h4>
       <ul class="text-gray-400 text-sm space-y-1">
-        <li><code class="text-primary-400">words</code> - Number of query words found</li>
-        <li><code class="text-primary-400">typo</code> - Number of typos</li>
-        <li><code class="text-primary-400">proximity</code> - Distance between query words</li>
-        <li><code class="text-primary-400">attribute</code> - Attribute ranking order</li>
-        <li><code class="text-primary-400">sort</code> - User-defined sort order</li>
-        <li><code class="text-primary-400">exactness</code> - Similarity of matched words</li>
+        <li><code class="text-primary-400">words</code> - {{ settingsStore.t('ruleWords') }}</li>
+        <li><code class="text-primary-400">typo</code> - {{ settingsStore.t('ruleTypo') }}</li>
+        <li><code class="text-primary-400">proximity</code> - {{ settingsStore.t('ruleProximity') }}</li>
+        <li><code class="text-primary-400">attribute</code> - {{ settingsStore.t('ruleAttribute') }}</li>
+        <li><code class="text-primary-400">sort</code> - {{ settingsStore.t('ruleSort') }}</li>
+        <li><code class="text-primary-400">exactness</code> - {{ settingsStore.t('ruleExactness') }}</li>
       </ul>
     </div>
   </div>
@@ -80,7 +80,10 @@
 
 <script setup>
 import { ref, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

@@ -138,8 +138,8 @@
     <div class="card p-6">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-lg font-semibold text-white">Filterable Attributes</h3>
-          <p class="text-gray-500 text-sm">Configure attributes that can be used for filtering and faceting.</p>
+          <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('filterableAttributes') }}</h3>
+          <p class="text-gray-500 text-sm">{{ settingsStore.t('filterableAttributesDesc') }}</p>
         </div>
         <button @click="saveFilterable" class="btn btn-primary text-sm" :disabled="savingFilterable">
           {{ savingFilterable ? settingsStore.t('saving') : settingsStore.t('save') }}

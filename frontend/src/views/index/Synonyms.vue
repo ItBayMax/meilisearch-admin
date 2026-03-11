@@ -2,11 +2,11 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Synonyms</h3>
-        <p class="text-gray-500 text-sm">Define words that should be considered equivalent in searches.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('synonyms') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('synonymsDesc') }}</p>
       </div>
       <button @click="saveSynonyms" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
@@ -18,14 +18,14 @@
             @input="updateKey(key, $event.target.value)"
             type="text"
             class="input text-sm"
-            placeholder="Word"
+            :placeholder="settingsStore.t('wordPlaceholder')"
           />
           <input
             :value="values.join(', ')"
             @input="updateValues(key, $event.target.value)"
             type="text"
             class="input text-sm"
-            placeholder="Synonyms (comma separated)"
+            :placeholder="settingsStore.t('synonymsPlaceholder')"
           />
         </div>
         <button @click="removeSynonym(key)" class="p-2 rounded hover:bg-dark-700 text-red-400">
@@ -36,15 +36,14 @@
       </div>
 
       <button @click="addSynonym" class="btn btn-ghost text-sm">
-        + Add Synonym
+        {{ settingsStore.t('addSynonym') }}
       </button>
     </div>
 
     <div class="card p-4">
-      <h4 class="text-white font-medium mb-2">Example</h4>
+      <h4 class="text-white font-medium mb-2">{{ settingsStore.t('synonymsExample') }}</h4>
       <p class="text-gray-400 text-sm">
-        If you set <code class="text-primary-400">phone</code> with synonyms <code class="text-primary-400">mobile, cellphone</code>,
-        searching for "phone" will also return results containing "mobile" or "cellphone".
+        {{ settingsStore.t('synonymsExampleText') }}
       </p>
     </div>
   </div>
@@ -52,7 +51,10 @@
 
 <script setup>
 import { ref, reactive, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

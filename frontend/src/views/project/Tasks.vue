@@ -3,9 +3,9 @@
     <!-- Filters -->
     <div class="flex flex-wrap items-center gap-4">
       <!-- Status Filter -->
-      <div class="relative">
+      <div class="relative" ref="statusFilterRef">
         <button
-          @click="showStatusFilter = !showStatusFilter"
+          @click="toggleFilter('status')"
           class="btn btn-secondary flex items-center space-x-2"
         >
           <span>{{ settingsStore.t('status') }}</span>
@@ -28,15 +28,15 @@
               v-model="filters.statuses"
               class="mr-2"
             />
-            <span class="text-sm text-gray-300">{{ status }}</span>
+            <span class="text-sm text-gray-300">{{ translateStatus(status) }}</span>
           </label>
         </div>
       </div>
 
       <!-- Type Filter -->
-      <div class="relative">
+      <div class="relative" ref="typeFilterRef">
         <button
-          @click="showTypeFilter = !showTypeFilter"
+          @click="toggleFilter('type')"
           class="btn btn-secondary flex items-center space-x-2"
         >
           <span>{{ settingsStore.t('type') }}</span>
@@ -65,9 +65,9 @@
       </div>
 
       <!-- Index Filter -->
-      <div class="relative">
+      <div class="relative" ref="indexFilterRef">
         <button
-          @click="showIndexFilter = !showIndexFilter"
+          @click="toggleFilter('index')"
           class="btn btn-secondary flex items-center space-x-2"
         >
           <span>{{ settingsStore.t('index') }}</span>
@@ -124,7 +124,7 @@
             @click="showTaskDetail(task)"
           >
             <td class="px-4 py-3">
-              <span :class="getStatusBadgeClass(task.status)">{{ task.status }}</span>
+              <span :class="getStatusBadgeClass(task.status)">{{ translateStatus(task.status) }}</span>
             </td>
             <td class="px-4 py-3 text-gray-300 text-sm">{{ task.type }}</td>
             <td class="px-4 py-3 text-gray-300 text-sm">{{ task.indexUid || '-' }}</td>
@@ -173,7 +173,7 @@
           </div>
           <div>
             <label class="text-gray-500 text-xs">{{ settingsStore.t('status') }}</label>
-            <p><span :class="getStatusBadgeClass(selectedTask.status)">{{ selectedTask.status }}</span></p>
+            <p><span :class="getStatusBadgeClass(selectedTask.status)">{{ translateStatus(selectedTask.status) }}</span></p>
           </div>
           <div>
             <label class="text-gray-500 text-xs">{{ settingsStore.t('type') }}</label>
@@ -212,7 +212,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject, onMounted } from 'vue'
+import { ref, reactive, inject, onMounted, onUnmounted } from 'vue'
 import { useSettingsStore } from '@/store/settings'
 import { taskApi, indexApi } from '@/api'
 import Modal from '@/components/common/Modal.vue'
@@ -231,6 +231,10 @@ const selectedTask = ref(null)
 const showStatusFilter = ref(false)
 const showTypeFilter = ref(false)
 const showIndexFilter = ref(false)
+
+const statusFilterRef = ref(null)
+const typeFilterRef = ref(null)
+const indexFilterRef = ref(null)
 
 const availableIndexes = ref([])
 
@@ -327,6 +331,34 @@ const closeAllFilters = () => {
   showIndexFilter.value = false
 }
 
+const toggleFilter = (type) => {
+  if (type === 'status') {
+    showStatusFilter.value = !showStatusFilter.value
+    showTypeFilter.value = false
+    showIndexFilter.value = false
+  } else if (type === 'type') {
+    showTypeFilter.value = !showTypeFilter.value
+    showStatusFilter.value = false
+    showIndexFilter.value = false
+  } else if (type === 'index') {
+    showIndexFilter.value = !showIndexFilter.value
+    showStatusFilter.value = false
+    showTypeFilter.value = false
+  }
+}
+
+const handleClickOutside = (event) => {
+  if (showStatusFilter.value && statusFilterRef.value && !statusFilterRef.value.contains(event.target)) {
+    showStatusFilter.value = false
+  }
+  if (showTypeFilter.value && typeFilterRef.value && !typeFilterRef.value.contains(event.target)) {
+    showTypeFilter.value = false
+  }
+  if (showIndexFilter.value && indexFilterRef.value && !indexFilterRef.value.contains(event.target)) {
+    showIndexFilter.value = false
+  }
+}
+
 const getStatusBadgeClass = (status) => {
   const classes = {
     succeeded: 'badge badge-success',
@@ -343,8 +375,24 @@ const formatDate = (dateStr) => {
   return new Date(dateStr).toLocaleString()
 }
 
+const translateStatus = (status) => {
+  const statusMap = {
+    succeeded: settingsStore.t('statusSucceeded'),
+    failed: settingsStore.t('statusFailed'),
+    canceled: settingsStore.t('statusCanceled'),
+    enqueued: settingsStore.t('statusEnqueued'),
+    processing: settingsStore.t('statusProcessing'),
+  }
+  return statusMap[status] || status
+}
+
 onMounted(() => {
   fetchTasks()
   fetchIndexes()
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>

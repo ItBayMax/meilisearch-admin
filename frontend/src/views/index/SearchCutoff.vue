@@ -2,17 +2,17 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Search Cutoff</h3>
-        <p class="text-gray-500 text-sm">Configure the maximum duration of a search query.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('searchCutoff') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('searchCutoffDesc') }}</p>
       </div>
       <button @click="saveSettings" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
     <div class="card p-6 space-y-6">
       <div>
-        <label class="label">Search Cutoff (milliseconds)</label>
+        <label class="label">{{ settingsStore.t('cutoffDuration') }}</label>
         <input
           v-model.number="searchCutoffMs"
           type="number"
@@ -22,17 +22,17 @@
           placeholder="1500"
         />
         <p class="text-gray-500 text-xs mt-2">
-          Meilisearch will interrupt any search taking longer than this value. Default is 1500ms.
+          {{ settingsStore.t('cutoffHint') }}
         </p>
       </div>
 
       <div class="bg-dark-800 rounded-lg p-4">
-        <h4 class="text-white font-medium mb-2">Recommended Values</h4>
+        <h4 class="text-white font-medium mb-2">{{ settingsStore.t('recommendedValues') }}</h4>
         <ul class="text-gray-400 text-sm space-y-1">
-          <li><code class="text-primary-400">1500</code> - Default, suitable for most use cases</li>
-          <li><code class="text-primary-400">500-1000</code> - For real-time search with strict latency requirements</li>
-          <li><code class="text-primary-400">3000-5000</code> - For complex queries on large datasets</li>
-          <li><code class="text-primary-400">null</code> - Disable cutoff (not recommended for production)</li>
+          <li><code class="text-primary-400">1500</code> - {{ settingsStore.t('rec1500') }}</li>
+          <li><code class="text-primary-400">500-1000</code> - {{ settingsStore.t('rec500') }}</li>
+          <li><code class="text-primary-400">3000-5000</code> - {{ settingsStore.t('rec3000') }}</li>
+          <li><code class="text-primary-400">null</code> - {{ settingsStore.t('recNull') }}</li>
         </ul>
       </div>
 
@@ -44,7 +44,7 @@
           class="text-primary-500"
         />
         <label for="disable-cutoff" class="text-gray-300 text-sm">
-          Disable search cutoff (searches will run until completion)
+          {{ settingsStore.t('disableCutoff') }}
         </label>
       </div>
     </div>
@@ -53,7 +53,10 @@
 
 <script setup>
 import { ref, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

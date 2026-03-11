@@ -291,6 +291,146 @@ const translations = {
     noVectorEngineConfigured: 'No vector engine configured for this index',
     configureVectorEngineFirst: 'Please configure vector engine in index settings first',
     goToEmbeddersSettings: 'Go to Embedders Settings',
+
+    // Task Status
+    statusSucceeded: 'Succeeded',
+    statusFailed: 'Failed',
+    statusCanceled: 'Canceled',
+    statusEnqueued: 'Enqueued',
+    statusProcessing: 'Processing',
+
+    // Attribute Settings
+    searchableAttributes: 'Searchable Attributes',
+    searchableAttributesDesc: 'Attributes used for search. Order determines relevance priority.',
+    displayedAttributes: 'Displayed Attributes',
+    displayedAttributesDesc: 'Attributes returned in search results.',
+    filterableAttributes: 'Filterable Attributes',
+    filterableAttributesDesc: 'Configure attributes that can be used for filtering and faceting.',
+    sortableAttributes: 'Sortable Attributes',
+    sortableAttributesDesc: 'Attributes that can be used for sorting search results.',
+
+    // Ranking Rules Page
+    rankingRulesDesc: 'Rules that determine the relevancy of search results. Order matters - rules are applied sequentially.',
+    resetToDefault: 'Reset to Default',
+    dragToReorder: 'Drag to reorder. The first rule has the most impact on relevancy.',
+    addCustomRule: '+ Add Custom Rule',
+    defaultRulesLabel: 'Default Rules',
+    ruleWords: 'Results are ranked by the number of matching query words in descending order',
+    ruleTypo: 'Results are ranked by the number of typos in ascending order',
+    ruleProximity: 'Results are ranked by the distance between matching query words in ascending order',
+    ruleAttribute: 'Results are ranked by attribute ranking order',
+    ruleSort: 'Results are ranked by query-time determined parameters',
+    ruleExactness: 'Results are ranked by the similarity of matched words to query words',
+
+    // Synonyms Page
+    synonymsDesc: 'Define synonyms so that different words return the same results.',
+    addSynonym: '+ Add Synonym',
+    wordPlaceholder: 'Word (e.g. happy)',
+    synonymsPlaceholder: 'Synonyms, comma separated (e.g. glad, joyful)',
+    synonymsExample: 'Example',
+    synonymsExampleText: 'If you set synonyms for "phone" as "mobile, cellphone", searching for "phone" will also return results containing "mobile" or "cellphone".',
+
+    // Typo Tolerance Page
+    typoToleranceDesc: 'Configure how Meilisearch handles typos in search queries.',
+    enableLabel: 'Enable Typo Tolerance',
+    enableDesc: 'Allow matches with typos in search queries.',
+    minWordOneTypo: 'Min Word Size for 1 Typo',
+    minWordTwoTypos: 'Min Word Size for 2 Typos',
+    disableOnWords: 'Disable on Words',
+    disableOnWordsPlaceholder: 'Words to disable typo tolerance on (one per line)',
+    disableOnWordsDesc: 'Typo tolerance will not apply to these words.',
+    disableOnAttributes: 'Disable on Attributes',
+    disableOnAttributesPlaceholder: 'Attributes to disable typo tolerance on (one per line)',
+    disableOnAttributesDesc: 'Typo tolerance will not apply to these attributes.',
+
+    // Prefix Search Page
+    prefixSearchDesc: 'Prefix search allows matching documents that begin with a specific query term. For example, searching for "hel" would match "hello", "help", "helicopter", etc.',
+    prefixSearchMode: 'Prefix Search Mode',
+    indexingTime: 'Indexing Time (Default)',
+    indexingTimeDesc: 'Prefix search data is computed during indexing. This uses more storage but provides faster search performance.',
+    prefixDisabled: 'Disabled',
+    prefixDisabledDesc: 'Prefix search is disabled. Only exact word matches will be returned.',
+    whatIsPrefixSearch: 'What is Prefix Search?',
+    prefixSearchNote: 'This setting is enabled by default and computed during indexing for optimal performance. Disabling it can reduce index size but will limit search functionality.',
+
+    // Stop Words Page
+    stopWordsDesc: 'Words that are ignored during search. Common examples: the, a, an, is, at.',
+    stopWordsPlaceholder: 'Enter stop words, one per line',
+    stopWordsHint: 'Stop words are ignored during search and do not contribute to relevancy scoring.',
+
+    // Separators Page
+    separatorsDesc: 'Characters used to separate words during indexing. By default, Meilisearch uses spaces and punctuation.',
+    separatorTokens: 'Separator Tokens',
+    separatorTokensPlaceholder: 'Characters that separate words (one per line)',
+    separatorTokensHint: 'Additional characters that should be treated as word separators.',
+    nonSeparatorTokens: 'Non-Separator Tokens',
+    nonSeparatorTokensPlaceholder: 'Characters that should NOT separate words (one per line)',
+    nonSeparatorTokensHint: 'Characters that should be kept as part of words.',
+
+    // Dictionary Page
+    dictionaryDesc: 'Custom words that Meilisearch should recognize as single terms during indexing.',
+    dictionaryPlaceholder: 'Enter dictionary words/patterns, one per line',
+    dictionaryHint: 'Patterns defined here will be treated as unique words during indexing.',
+
+    // Pagination Page
+    paginationDesc: 'Configure the maximum number of hits a search query can return.',
+    maxTotalHits: 'Max Total Hits',
+    paginationHint: 'Default: 1000. Higher values may affect performance.',
+
+    // Faceting Page
+    facetingDesc: 'Configure the maximum number of values returned per facet in search results.',
+    maxValuesPerFacet: 'Max Values Per Facet',
+    facetingHint: 'Default: 100. Maximum number of different values per facet.',
+    sortFacetValuesBy: 'Sort Facet Values By',
+    alphabetically: 'Alphabetically (alpha)',
+    byCount: 'By count (count)',
+
+    // Search Cutoff Page
+    searchCutoffDesc: 'Configure the maximum duration of a search query in milliseconds. Meilisearch will stop searching after this time and return the best results found.',
+    cutoffDuration: 'Search Cutoff (milliseconds)',
+    cutoffHint: 'Meilisearch will interrupt any search taking longer than this value. Default is 1500ms.',
+    disableCutoff: 'Disable search cutoff (searches will run until completion)',
+    recommendedValues: 'Recommended Values',
+    rec1500: 'Default, suitable for most use cases',
+    rec500: 'For real-time search with strict latency requirements',
+    rec3000: 'For complex queries on large datasets',
+    recNull: 'Disable cutoff (not recommended for production)',
+
+    // Embedders Page
+    embeddersDesc: 'Configure vector embedders for AI-powered search.',
+    addEmbedder: 'Add Embedder',
+    noEmbedders: 'No Embedders Configured',
+    noEmbeddersDesc: 'Embedders generate vector data from your documents for AI-powered semantic search.',
+    editEmbedder: 'Edit Embedder',
+    deleteEmbedder: 'Delete Embedder',
+    embedderName: 'Embedder Name *',
+    embedderNameHint: 'Unique identifier for this embedder',
+    sourceLabel: 'Source *',
+    modelLabel: 'Model',
+    dimensionsLabel: 'Dimensions',
+    dimensionsHint: 'Number of dimensions in the embedding vectors',
+    commonSettings: 'Common Settings',
+    documentTemplate: 'Document Template',
+    documentTemplateMaxBytes: 'Document Template Max Bytes',
+    binaryQuantized: 'Binary Quantized (irreversible)',
+    deleteEmbedderConfirm: 'Are you sure you want to delete embedder',
+    deleteEmbedderWarn: 'This may trigger reindexing of all documents.',
+    userProvidedInfo: "With user-provided embeddings, you must include vector data in your documents' _vectors field and generate vectors for search queries manually.",
+    poolingLabel: 'Pooling',
+    requestTemplate: 'Request Template (JSON)',
+    responseTemplate: 'Response Path (JSON)',
+    updateBtn: 'Update',
+    apiKeyLabel: 'API Key',
+    urlOptional: 'URL (Optional)',
+    urlRequired: 'URL *',
+    modelRequired: 'Model *',
+    apiKeyOptional: 'API Key (Optional)',
+
+    // Extra Experimental Features
+    compositeEmbedders: 'Composite Embedders',
+    compositeEmbeddersDesc: 'Enable composite embedders that combine multiple embedding sources',
+    getTaskDocumentsRoute: 'Task Documents Route',
+    getTaskDocumentsRouteDesc: 'Enable route to retrieve documents associated with tasks',
   },
   zh: {
     // Common
@@ -400,7 +540,7 @@ const translations = {
     separators: '分隔符',
     dictionary: '字典',
     pagination: '分页',
-    faceting: '分面',
+    faceting: '分页大小',
     searchCutoff: '搜索截止',
     embedders: '向量化',
     noIndexes: '暂无索引',
@@ -587,43 +727,146 @@ const translations = {
     noVectorEngineConfigured: '该索引未配置向量引擎',
     configureVectorEngineFirst: '请先在索引设置中配置向量引擎',
     goToEmbeddersSettings: '前往向量嵌入设置',
-  },
-  en: {
-    // Experimental Features
-    experimentalFeatures: 'Experimental Features',
-    refresh: 'Refresh',
-    loadingFeatures: 'Loading...',
-    failedToLoadFeatures: 'Failed to load experimental features information',
-    vectorStore: 'Vector Store',
-    vectorStoreDesc: 'Enable vector search and AI-powered search functionality',
-    metrics: 'Metrics',
-    metricsDesc: 'Enable performance metrics collection and monitoring',
-    logsRoute: 'Logs Route',
-    logsRouteDesc: 'Enable log viewing route',
-    containsFilter: 'Contains Filter',
-    containsFilterDesc: 'Enable contains filter functionality',
-    editDocumentsByFunction: 'Edit Documents by Function',
-    editDocumentsByFunctionDesc: 'Allow editing documents through functions',
-    network: 'Network',
-    networkDesc: 'Enable network-related functionality',
-    chatCompletions: 'Chat Completions',
-    chatCompletionsDesc: 'Enable chat completions API',
-    multimodal: 'Multimodal Search',
-    multimodalDesc: 'Enable multimodal search (images, audio, etc.)',
-    
-    // Vector Search in Project Search
-    vectorSearch: 'Vector Search',
-    enableVectorSearch: 'Enable Vector Search',
-    semanticRatio: 'Semantic Search Ratio',
-    keywordSearch: 'Keyword Search',
-    semanticSearch: 'Semantic Search',
-    selectEmbedder: 'Select Embedder',
-    hybridSearchInfo1: 'Hybrid search combines keyword matching and semantic understanding',
-    hybridSearchInfo2: 'Higher semantic ratio focuses more on content meaning than literal matching',
-    hybridSearchInfo3: 'Requires embedder configuration in Embedders first',
-    noVectorEngineConfigured: 'No vector engine configured for this index',
-    configureVectorEngineFirst: 'Please configure vector engine in index settings first',
-    goToEmbeddersSettings: 'Go to Embedders Settings',
+
+    // Task Status
+    statusSucceeded: '成功',
+    statusFailed: '失败',
+    statusCanceled: '已取消',
+    statusEnqueued: '排队中',
+    statusProcessing: '处理中',
+
+    // Attribute Settings
+    searchableAttributes: '可搜索属性',
+    searchableAttributesDesc: '用于搜索的属性。顺序决定相关性优先级。',
+    displayedAttributes: '显示属性',
+    displayedAttributesDesc: '在搜索结果中返回的属性。',
+    filterableAttributes: '可过滤属性',
+    filterableAttributesDesc: '配置可用于过滤和分面的属性。',
+    sortableAttributes: '可排序属性',
+    sortableAttributesDesc: '可用于搜索结果排序的属性。',
+
+    // Ranking Rules Page
+    rankingRulesDesc: '决定搜索结果排序方式的规则。顺序很重要 - 规则按顺序依次应用。',
+    resetToDefault: '恢复默认',
+    dragToReorder: '拖拽重新排序。第一条规则对相关性影响最大。',
+    addCustomRule: '+ 添加自定义规则',
+    defaultRulesLabel: '默认规则',
+    ruleWords: '结果按匹配查询词的数量降序排列',
+    ruleTypo: '结果按拼写错误数量升序排列',
+    ruleProximity: '结果按匹配查询词之间的距离升序排列',
+    ruleAttribute: '结果按属性排序顺序排列',
+    ruleSort: '结果按查询时决定的参数排列',
+    ruleExactness: '结果按匹配词与查询词的相似度排列',
+
+    // Synonyms Page
+    synonymsDesc: '定义同义词，使不同的词返回相同的结果。',
+    addSynonym: '+ 添加同义词',
+    wordPlaceholder: '词语 (例如 happy)',
+    synonymsPlaceholder: '同义词，逗号分隔 (例如 glad, joyful)',
+    synonymsExample: '示例',
+    synonymsExampleText: '如果设置 "phone" 的同义词为 "mobile, cellphone"，搜索 "phone" 也会返回包含 "mobile" 或 "cellphone" 的结果。',
+
+    // Typo Tolerance Page
+    typoToleranceDesc: '配置 Meilisearch 如何处理搜索查询中的拼写错误。',
+    enableLabel: '启用',
+    enableDesc: '开启或关闭拼写容错',
+    minWordOneTypo: '允许 1 个拼写错误的最小词长',
+    minWordTwoTypos: '允许 2 个拼写错误的最小词长',
+    disableOnWords: '禁用拼写容错的词语',
+    disableOnWordsPlaceholder: '不启用拼写容错的词语（每行一个）',
+    disableOnWordsDesc: '对这些词不启用拼写容错。',
+    disableOnAttributes: '禁用拼写容错的属性',
+    disableOnAttributesPlaceholder: '不启用拼写容错的属性（每行一个）',
+    disableOnAttributesDesc: '对这些属性不启用拼写容错。',
+
+    // Prefix Search Page
+    prefixSearchDesc: '前缀搜索允许匹配以特定查询词开头的文档。例如，搜索 "hel" 会匹配 "hello"、"help"、"helicopter" 等。',
+    prefixSearchMode: '前缀搜索模式',
+    indexingTime: '索引时计算 (默认)',
+    indexingTimeDesc: '前缀搜索数据在索引时计算。使用更多存储空间，但搜索性能更快。',
+    prefixDisabled: '禁用',
+    prefixDisabledDesc: '前缀搜索已禁用。仅返回精确的词语匹配结果。',
+    whatIsPrefixSearch: '什么是前缀搜索？',
+    prefixSearchNote: '此设置默认启用，在索引时计算以获得最佳性能。禁用后可减小索引大小，但会限制搜索功能。',
+
+    // Stop Words Page
+    stopWordsDesc: '在搜索查询中被忽略的词语。常见示例：the, a, an, is, at。',
+    stopWordsPlaceholder: '每行输入一个停止词',
+    stopWordsHint: '停止词在搜索时被忽略，不参与相关性评分。',
+
+    // Separators Page
+    separatorsDesc: '索引时用于分隔词语的字符。默认情况下，Meilisearch 使用空格和标点符号。',
+    separatorTokens: '分隔符',
+    separatorTokensPlaceholder: '每行输入一个分隔字符',
+    separatorTokensHint: '应被视为词语分隔符的额外字符。',
+    nonSeparatorTokens: '非分隔符',
+    nonSeparatorTokensPlaceholder: '每行输入一个非分隔字符',
+    nonSeparatorTokensHint: '应保留为词语一部分的字符。',
+
+    // Dictionary Page
+    dictionaryDesc: 'Meilisearch 在索引时应识别为单个术语的自定义词语。',
+    dictionaryPlaceholder: '每行输入一个词语或模式',
+    dictionaryHint: '此处定义的模式在索引时将被视为独立词语。',
+
+    // Pagination Page
+    paginationDesc: '配置搜索查询可返回的最大命中数。',
+    maxTotalHits: '最大命中总数',
+    paginationHint: '默认：1000。值越大可能影响性能。',
+
+    // Faceting Page
+    facetingDesc: '配置搜索结果中每个分面返回的最大值数。',
+    maxValuesPerFacet: '每个分面的最大值数',
+    facetingHint: '默认：100。每个分面不同值的最大数量。',
+    sortFacetValuesBy: '分面值排序方式',
+    alphabetically: '按字母排序 (alpha)',
+    byCount: '按数量排序 (count)',
+
+    // Search Cutoff Page
+    searchCutoffDesc: '配置搜索查询的最大持续时间（毫秒）。Meilisearch 将在此时间后停止搜索并返回已找到的最佳结果。',
+    cutoffDuration: '截止时间 (ms)',
+    cutoffHint: 'Meilisearch 将中断超过此值的搜索。默认 1500ms。',
+    disableCutoff: '禁用搜索截止（搜索将运行至完成）',
+    recommendedValues: '推荐值',
+    rec1500: '默认值，适用于大多数场景',
+    rec500: '适用于有严格延迟要求的实时搜索',
+    rec3000: '适用于大型数据集上的复杂查询',
+    recNull: '禁用截止（不推荐用于生产环境）',
+
+    // Embedders Page
+    embeddersDesc: '配置向量嵌入器以实现 AI 驱动的搜索。',
+    addEmbedder: '添加嵌入器',
+    noEmbedders: '未配置嵌入器',
+    noEmbeddersDesc: '嵌入器从文档生成向量数据，用于 AI 语义搜索。',
+    editEmbedder: '编辑嵌入器',
+    deleteEmbedder: '删除嵌入器',
+    embedderName: '嵌入器名称 *',
+    embedderNameHint: '此嵌入器的唯一标识',
+    sourceLabel: '来源 *',
+    modelLabel: '模型',
+    dimensionsLabel: '维度',
+    dimensionsHint: '嵌入向量的维度数',
+    commonSettings: '通用设置',
+    documentTemplate: '文档模板',
+    documentTemplateMaxBytes: '文档模板最大字节数',
+    binaryQuantized: '二值量化（不可逆）',
+    deleteEmbedderConfirm: '确定要删除嵌入器',
+    deleteEmbedderWarn: '这可能会触发所有文档的重新索引。',
+    userProvidedInfo: '使用用户自定义嵌入时，您必须在文档的 _vectors 字段中包含向量数据，并手动为搜索查询生成向量。',
+    poolingLabel: '池化方式',
+    requestTemplate: '请求模板 (JSON)',
+    responseTemplate: '响应路径 (JSON)',
+    updateBtn: '更新',
+    apiKeyLabel: 'API 密钥',
+    urlOptional: 'URL（可选）',
+    urlRequired: 'URL *',
+    modelRequired: '模型 *',
+    apiKeyOptional: 'API 密钥（可选）',
+
+    // Extra Experimental Features
+    compositeEmbedders: '组合嵌入器',
+    compositeEmbeddersDesc: '启用组合嵌入器，可以组合多个嵌入源',
+    getTaskDocumentsRoute: '任务文档路由',
+    getTaskDocumentsRouteDesc: '启用获取任务关联文档的路由',
   }
 };
 

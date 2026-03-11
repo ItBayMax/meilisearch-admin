@@ -2,11 +2,11 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Dictionary</h3>
-        <p class="text-gray-500 text-sm">Define patterns that should be treated as single words.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('dictionary') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('dictionaryDesc') }}</p>
       </div>
       <button @click="saveDictionary" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
@@ -15,10 +15,10 @@
         v-model="dictionaryText"
         class="input font-mono text-sm"
         rows="10"
-        placeholder="Enter dictionary words/patterns, one per line"
+        :placeholder="settingsStore.t('dictionaryPlaceholder')"
       ></textarea>
       <p class="text-gray-500 text-xs mt-2">
-        Patterns defined here will be treated as unique words during indexing.
+        {{ settingsStore.t('dictionaryHint') }}
       </p>
     </div>
   </div>
@@ -26,7 +26,10 @@
 
 <script setup>
 import { ref, computed, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')

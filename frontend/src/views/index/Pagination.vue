@@ -2,17 +2,17 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h3 class="text-lg font-semibold text-white">Pagination</h3>
-        <p class="text-gray-500 text-sm">Configure the maximum number of results per search.</p>
+        <h3 class="text-lg font-semibold text-white">{{ settingsStore.t('pagination') }}</h3>
+        <p class="text-gray-500 text-sm">{{ settingsStore.t('paginationDesc') }}</p>
       </div>
       <button @click="savePagination" class="btn btn-primary text-sm" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+        {{ saving ? settingsStore.t('saving') : settingsStore.t('save') }}
       </button>
     </div>
 
     <div class="card p-6">
       <div>
-        <label class="label">Max Total Hits</label>
+        <label class="label">{{ settingsStore.t('maxTotalHits') }}</label>
         <input
           v-model.number="maxTotalHits"
           type="number"
@@ -21,8 +21,7 @@
           max="100000"
         />
         <p class="text-gray-500 text-xs mt-2">
-          The maximum number of search results that can be returned. Default is 1000.
-          This setting protects your database from malicious scraping.
+          {{ settingsStore.t('paginationHint') }}
         </p>
       </div>
     </div>
@@ -31,7 +30,10 @@
 
 <script setup>
 import { ref, inject, watch } from 'vue'
+import { useSettingsStore } from '@/store/settings'
 import { indexApi } from '@/api'
+
+const settingsStore = useSettingsStore()
 
 const projectId = inject('projectId')
 const indexId = inject('indexId')
